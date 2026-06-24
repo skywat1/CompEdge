@@ -1,0 +1,10 @@
+Kitchen luxury scoring results
+Model: gpt-4o | reps: 1 | temperature: 0.2
+======================================================================
+
+=== test1.webp ===
+Test  1: score=0, level=1, confidence=0.9, valid=False, reasoning="The image shows a dining room, not a living room, making it unscorable for the intended purpose. The room features high-end design elements such as built-in shelving, elegant lighting, and a sophisticated color palette, indicating a high level of luxury, but it is not a living room."
+Level consistent across all 1 reps: True
+Average score: 0
+Average confidence: 0.9
+
