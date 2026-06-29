@@ -1,6 +1,16 @@
 ```mermaid
 flowchart TD
+
     SCRAPE[Scrape from Zillow]
+
+    subgraph CLEAN_ZILLOW[Clean/Process Zillow Data]
+        ZRAW[(Raw Zillow Data)]
+        ZRAW --> ZCLEAN[Clean Data]
+        ZCLEAN --> ZCLEANED[(Cleaned Zillow Data)]
+         ZCLEANED --> |Image Links| IMGDOWNLOAD[Download Photos]
+    end
+
+    SCRAPE --> ZRAW
 
     subgraph DATA_SRC[Data Sources]
         STRUCT_ATTR[(Structural<br/>Attributes)]
@@ -8,9 +18,9 @@ flowchart TD
         PRICE[(Sale Price)]
     end
 
-    SCRAPE --> STRUCT_ATTR
-    SCRAPE --> PHOTOS
-    SCRAPE --> PRICE
+    ZCLEANED --> STRUCT_ATTR
+    IMGDOWNLOAD --> PHOTOS
+    ZCLEANED --> PRICE
 
     PHOTOS --> ROOM_CNN
 
