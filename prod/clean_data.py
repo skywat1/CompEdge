@@ -111,5 +111,22 @@ df = df[~missing_sold]
 reference_date = pd.Timestamp('2026-07-02')
 df['days_old'] = (reference_date - pd.to_datetime(df['sold_date'], format='%m/%d/%Y', errors='coerce')).dt.days
 
+
+#Dedup image links
+def dedup_images(cell):
+    if pd.isna(cell):
+        return cell
+    links = [link.strip() for link in cell.split(',') if link.strip()]
+    seen = set()
+    unique = []
+    for link in links:
+        if link not in seen:
+            seen.add(link)
+            unique.append(link)
+    return ','.join(unique)
+
+df['all_images'] = df['all_images'].apply(dedup_images)
+
+
 # Output cleaned data
 df.to_csv('data/cleaned_sold.csv', index=False)
