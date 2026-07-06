@@ -4,9 +4,9 @@ flowchart TD
     SCRAPE[Scrape from Zillow]
 
     subgraph CLEAN_ZILLOW[Clean/Process Zillow Data]
-        ZRAW[(Raw Zillow Data)]
-        ZRAW --> ZCLEAN[Clean Data]
-        ZCLEAN --> ZCLEANED[(Cleaned Zillow Data)]
+        ZRAW[(Raw Zillow Data <br/> raw_sold.csv)]
+        ZRAW --> ZCLEAN[Clean Data <br/> clean_data.py]
+        ZCLEAN --> ZCLEANED[(Cleaned Zillow Data <br/> cleaned_sold.csv)]
          ZCLEANED --> |Image Links| IMGDOWNLOAD[Download Photos]
     end
 
