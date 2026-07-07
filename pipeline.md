@@ -15,20 +15,24 @@ flowchart TD
         IMAGE_LINKS --> DOWNLOAD_IMAGES[Download Images <br/> download_images.py]
     end
 
-    subgraph DOWNLOAD_PLUTO[Download PLUTO]
-        ZCLEANED --> GET_BBL[Geoclient V2]
-        GET_BBL --> PLUTO[PLUTO <br/> 64uk-42ks]
-    end
-
     SCRAPE --> ZRAW
     DOWNLOAD_IMAGES --> IMAGES
+
+    subgraph GEOCLIENT_PLUTO[Geoclient and Pluto]
+        ZCLEANED --> GEOCLIENT[Geoclient V2 <br/> get_geoclient.py]
+        GEOCLIENT --> GEOCLIENT_DATA_SRC[(Geoclient Data <br/> geoclient.csv)]
+        GEOCLIENT_DATA_SRC -->  PLUTO[PLUTO <br/> get_pluto.py]
+    end
+
+    GEOCLIENT_DATA_SRC -.-> |Same data| GEOCLIENT_DATA
     PLUTO --> PLUTO_DATA
 
     subgraph DATA_SRC[Data Sources]
         STRUCT_ATTR[(Structural<br/>Attributes)]
         IMAGES[(Images)]
         PRICE[(Sale Price)]
-        PLUTO_DATA[(Pluto Data <br/> pluto_data.csv)]
+        GEOCLIENT_DATA[(Geoclient Data <br/> geoclient.csv)]
+        PLUTO_DATA[(Pluto Data <br/> pluto.csv)]
     end
 
     ZCLEANED --> STRUCT_ATTR
@@ -51,7 +55,7 @@ flowchart TD
     AGGR_PHOTOS --> IMG_MATRIX[(Luxury Scores per property<br/>Matrix)]
 
     subgraph POI_PROC[Process POIs]
-        PLUTO_DATA --> CREATE_CIRCLES[Create Circle of 600m radius around each property]
+        GEOCLIENT_DATA --> CREATE_CIRCLES[Create Circle of 600m radius around each property]
         CREATE_CIRCLES --> POI_DATE_AGGR[Group properties into <br/> sold month]
         POI_DATE_AGGR --> OHSOME[Get POI counts per category in each month]
     end
@@ -63,9 +67,9 @@ flowchart TD
     IMG_MATRIX --> JOIN_TABLES
     POI_MATRIX --> JOIN_TABLES
     PLUTO_DATA --> JOIN_TABLES
-    JOIN_TABLES --> ALL_FEATURES[(All Combined Features <br/> Matrix)]
+    GEOCLIENT_DATA --> JOIN_TABLES
 
-    ALL_FEATURES --> XGBOOST[XGBoost <br/> Regression]
+    JOIN_TABLES --> XGBOOST[XGBoost <br/> Regression]
     XGBOOST --> PRICE_PRED([Predicted Sale Price])
     XGBOOST --> LOSS[Loss]
     PRICE --> LOG_PRICE[Log Price]

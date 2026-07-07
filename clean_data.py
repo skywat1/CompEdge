@@ -25,6 +25,12 @@ df = df.rename(columns={'area': 'lot_area'})
 # Clean formatting and change types
 df['address'] = df['address'].str.split(',').str[0].str.strip()
 
+# If no borough, coerce to Brookyln
+# ONLY BECAUSE DATA IS BROOKLYN ONLY. CHANGE WHEN INCOORPERATING
+# OTHER BOROUGHS
+_BOROUGHS = {'Manhattan', 'Bronx', 'Brooklyn', 'Queens', 'Staten Island'}
+df['borough'] = df['borough'].where(df['borough'].isin(_BOROUGHS), 'Brooklyn')
+
 df['area-sqft'] = pd.to_numeric(
     df['area-sqft'].str.replace(',', '', regex=False),
     errors='coerce'
