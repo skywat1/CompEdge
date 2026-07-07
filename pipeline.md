@@ -7,24 +7,36 @@ flowchart TD
         ZRAW[(Raw Zillow Data <br/> raw_sold.csv)]
         ZRAW --> ZCLEAN[Clean Data <br/> clean_data.py]
         ZCLEAN --> ZCLEANED[(Cleaned Zillow Data <br/> cleaned_sold.csv)]
-         ZCLEANED --> |Image Links| IMGDOWNLOAD[Download Photos]
+    end
+
+    subgraph DOWNLOAD_IMAGES_GRAPH[Download Images]
+        ZCLEANED --> SPLIT[Split Data <br/> split_data.py]
+        SPLIT --> IMAGE_LINKS[(Image Links <br/> image_links.csv)]
+        IMAGE_LINKS --> DOWNLOAD_IMAGES[Download Images <br/> download_images.py]
+    end
+
+    subgraph DOWNLOAD_PLUTO[Download PLUTO]
+        ZCLEANED --> GET_BBL[Geoclient V2]
+        GET_BBL --> PLUTO[PLUTO <br/> 64uk-42ks]
     end
 
     SCRAPE --> ZRAW
+    DOWNLOAD_IMAGES --> IMAGES
+    PLUTO --> PLUTO_DATA
 
     subgraph DATA_SRC[Data Sources]
         STRUCT_ATTR[(Structural<br/>Attributes)]
-        PHOTOS[(Photos)]
+        IMAGES[(Images)]
         PRICE[(Sale Price)]
+        PLUTO_DATA[(Pluto Data <br/> pluto_data.csv)]
     end
 
     ZCLEANED --> STRUCT_ATTR
-    IMGDOWNLOAD --> PHOTOS
     ZCLEANED --> PRICE
 
-    PHOTOS --> ROOM_CNN
+    IMAGES --> ROOM_CNN
 
-    subgraph PHOTOS_PROC[Process Photos]
+    subgraph IMAGES_PROC[Process Images]
         ROOM_CNN[Room Classifier <br/> CNN]
         ROOM_CNN --> IN_ROOM_SET{Room is in <br/> Room Set}
         IN_ROOM_SET --> |Yes| LLM_IMG_PROMPT[Prompt LLM with correspodning room type prompt]
@@ -39,9 +51,7 @@ flowchart TD
     AGGR_PHOTOS --> IMG_MATRIX[(Luxury Scores per property<br/>Matrix)]
 
     subgraph POI_PROC[Process POIs]
-        STRUCT_ATTR --> |Address| GET_BBL[Get BBL<br/>Geoclient V2]
-        GET_BBL --> PLUTO_POI[Get Lat/Lng <br/> PLUTO <br/> 64uk-42ks]
-        PLUTO_POI --> CREATE_CIRCLES[Create Circle of 600m radius around each property]
+        PLUTO_DATA --> CREATE_CIRCLES[Create Circle of 600m radius around each property]
         CREATE_CIRCLES --> POI_DATE_AGGR[Group properties into <br/> sold month]
         POI_DATE_AGGR --> OHSOME[Get POI counts per category in each month]
     end
@@ -52,6 +62,7 @@ flowchart TD
     STRUCT_ATTR --> JOIN_TABLES
     IMG_MATRIX --> JOIN_TABLES
     POI_MATRIX --> JOIN_TABLES
+    PLUTO_DATA --> JOIN_TABLES
     JOIN_TABLES --> ALL_FEATURES[(All Combined Features <br/> Matrix)]
 
     ALL_FEATURES --> XGBOOST[XGBoost <br/> Regression]

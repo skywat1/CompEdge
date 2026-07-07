@@ -4,8 +4,6 @@ import re
 import json
 from bs4 import BeautifulSoup
 
-from fetch_missing import get_bbl, pluto
-
 # Read Data
 df = pd.read_csv('data/raw_sold.csv')
 

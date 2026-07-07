@@ -90,15 +90,15 @@ def pluto(bbl: str):
     })
     
     
-# # Fill missing data with PLUTO
-# # One API call per row -> a DataFrame with all PLUTO_FIELDS as columns
-# pluto_data = df.apply(
-#     lambda row: pluto(get_bbl(row['address'], row['borough'])),
-#     axis=1
-# )
+df = pd.read_csv('data/cleaned_sold.csv')
+    
+# Fill missing data with PLUTO
+# One API call per row -> a DataFrame with all PLUTO_FIELDS as columns
+pluto_data = df.apply(
+    lambda row: pluto(get_bbl(row['address'], row['borough'])),
+    axis=1
+)
 
-# # New columns: always added from PLUTO
-# df[['latitude', 'longitude']] = pluto_data[['latitude', 'longitude']]
+df[PLUTO_FIELDS] = pluto_data[PLUTO_FIELDS]
 
-# Fill-if-missing: only overwrite cells that were NaN in the original data
-# df['lot_area'] = df['lot_area'].fillna(pluto_data['lot_area'])
+df.to_csv('data/pluto_data.csv')

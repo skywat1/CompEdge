@@ -1,1 +1,8 @@
-/prod/images
+/images
+/__pycache__
+/venv
+
+.env
+.env
+geoclient_keys.txt
+.DS_Store

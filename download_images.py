@@ -92,7 +92,7 @@ def download_one(session, task):
 
 def main(argv):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--csv", default="data/photo_links.csv")
+    ap.add_argument("--csv", default="data/image_links.csv")
     ap.add_argument("--images-dir", default="images")
     ap.add_argument("--workers", type=int, default=12)
     args = ap.parse_args(argv[1:])
