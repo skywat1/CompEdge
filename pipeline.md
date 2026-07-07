@@ -69,7 +69,7 @@ flowchart TD
     PLUTO_DATA --> JOIN_TABLES
     GEOCLIENT_DATA --> JOIN_TABLES
 
-    JOIN_TABLES --> XGBOOST[XGBoost <br/> Regression]
+    JOIN_TABLES --> XGBOOST[XGBoost <br/> regression.py]
     XGBOOST --> PRICE_PRED([Predicted Sale Price])
     XGBOOST --> LOSS[Loss]
     PRICE --> LOG_PRICE[Log Price]
