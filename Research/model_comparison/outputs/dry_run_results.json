@@ -1,0 +1,307 @@
+{
+  "classify": [
+    {
+      "image": "kitchen1.webp",
+      "expected": "kitchen",
+      "parsed": {
+        "room_type": "kitchen"
+      },
+      "response_model": "gpt-4o-2024-08-06",
+      "input_tokens": 157,
+      "output_tokens": 7,
+      "latency_s": 3.484584708996408,
+      "cost_usd": 0.0004625
+    },
+    {
+      "image": "bathroom1.webp",
+      "expected": "bathroom",
+      "parsed": {
+        "room_type": "bathroom"
+      },
+      "response_model": "gpt-4o-2024-08-06",
+      "input_tokens": 157,
+      "output_tokens": 7,
+      "latency_s": 12.643407332994684,
+      "cost_usd": 0.0004625
+    },
+    {
+      "image": "living1.webp",
+      "expected": "living_room",
+      "parsed": {
+        "room_type": "living_room"
+      },
+      "response_model": "gpt-4o-2024-08-06",
+      "input_tokens": 157,
+      "output_tokens": 7,
+      "latency_s": 1.8529144170024665,
+      "cost_usd": 0.0004625
+    }
+  ],
+  "score": {
+    "gpt-4o": [
+      {
+        "image": "kitchen1.webp",
+        "parsed": {
+          "reasoning": "This kitchen features custom cabinetry with a seamless design, high-end integrated appliances, and a minimalist aesthetic. The countertops appear to be premium stone, and the overall layout is spacious with ample natural light. The design is cohesive and modern, aligning with upscale or luxury standards.",
+          "score": 6.8,
+          "level": 7,
+          "confidence": 0.95,
+          "valid": true,
+          "room_type": "kitchen"
+        },
+        "response_model": "gpt-4o-2024-08-06",
+        "input_tokens": 2081,
+        "output_tokens": 83,
+        "thought_tokens": 0,
+        "latency_s": 3.8065740410020226,
+        "cost_usd": 0.0060325
+      },
+      {
+        "image": "bathroom1.webp",
+        "parsed": {
+          "reasoning": "This bathroom features a spacious layout with a freestanding designer tub, large windows providing abundant natural light, and a double vanity with premium cabinetry. The chandelier and high-end finishes contribute to a luxurious, spa-like atmosphere. These elements align with the characteristics of a Level 7 luxury bathroom.",
+          "score": 7.5,
+          "level": 8,
+          "confidence": 0.95,
+          "valid": true,
+          "room_type": "bathroom"
+        },
+        "response_model": "gpt-4o-2024-08-06",
+        "input_tokens": 2280,
+        "output_tokens": 87,
+        "thought_tokens": 0,
+        "latency_s": 4.606769207995967,
+        "cost_usd": 0.00657
+      },
+      {
+        "image": "living1.webp",
+        "parsed": {
+          "reasoning": "The living room features expansive windows with a stunning city view, a modern fireplace, and high ceilings. The furniture is designer quality with a cohesive and elegant palette. The room's open layout and premium finishes, including the statement lighting fixture, contribute to a luxurious atmosphere.",
+          "score": 7.5,
+          "level": 8,
+          "confidence": 0.95,
+          "valid": true,
+          "room_type": "living_room"
+        },
+        "response_model": "gpt-4o-2024-08-06",
+        "input_tokens": 2593,
+        "output_tokens": 83,
+        "thought_tokens": 0,
+        "latency_s": 5.285751625000557,
+        "cost_usd": 0.0073125
+      }
+    ],
+    "gemini-3.5-flash": [
+      {
+        "image": "kitchen1.webp",
+        "parsed": {
+          "reasoning": "This kitchen features extensive custom floor-to-ceiling cabinetry with integrated appliances, premium stone countertops with a matching slab backsplash, and a professional-grade range with a custom hood. The minimalist designer aesthetic, spacious layout, and high-end finishes align with top-tier luxury standards.",
+          "score": 6.6,
+          "level": 7,
+          "confidence": 0.9,
+          "valid": true,
+          "room_type": "kitchen"
+        },
+        "response_model": "gemini-3.5-flash",
+        "input_tokens": 2608,
+        "output_tokens": 719,
+        "thought_tokens": 608,
+        "latency_s": 6.407534417005081,
+        "cost_usd": 0.010383
+      },
+      {
+        "image": "bathroom1.webp",
+        "parsed": {
+          "reasoning": "This exceptionally spacious, spa-like master bathroom features a freestanding designer soaking tub positioned in front of a large window with city views. It boasts an expansive custom wood vanity, premium stone countertops, high-end minimalist fixtures, and a designer pendant light. The extensive high-quality tiling and clean, modern architectural lines place it firmly in the luxury/spa category.",
+          "score": 7.3,
+          "level": 7,
+          "confidence": 0.95,
+          "valid": true,
+          "room_type": "bathroom"
+        },
+        "response_model": "gemini-3.5-flash",
+        "input_tokens": 2829,
+        "output_tokens": 828,
+        "thought_tokens": 700,
+        "latency_s": 12.785245332997874,
+        "cost_usd": 0.0116955
+      },
+      {
+        "image": "living1.webp",
+        "parsed": {
+          "reasoning": "This living room features expansive floor-to-ceiling windows offering a premium city skyline view, high-end designer furniture, and a modern fireplace. The spacious layout, elegant branch chandelier, and seamless transition to an outdoor terrace represent a high level of luxury and architectural detail.",
+          "score": 7.2,
+          "level": 7,
+          "confidence": 0.9,
+          "valid": true,
+          "room_type": "living_room"
+        },
+        "response_model": "gemini-3.5-flash",
+        "input_tokens": 2820,
+        "output_tokens": 673,
+        "thought_tokens": 562,
+        "latency_s": 6.442991916999745,
+        "cost_usd": 0.010287
+      }
+    ],
+    "gemini-2.5-flash": [
+      {
+        "image": "kitchen1.webp",
+        "parsed": {
+          "reasoning": "This kitchen features extensive custom, floor-to-ceiling white cabinetry with integrated appliances, including a hidden refrigerator and wall oven. The countertops appear to be a premium white stone, complemented by sleek, modern lighting and large windows. The overall design is pristine, cohesive, and indicative of high-end materials and professional-grade appliances.",
+          "score": 6.8,
+          "level": 7,
+          "confidence": 5,
+          "valid": true,
+          "room_type": "kitchen"
+        },
+        "response_model": "gemini-2.5-flash",
+        "input_tokens": 980,
+        "output_tokens": 761,
+        "thought_tokens": 642,
+        "latency_s": 7.0740658750000875,
+        "cost_usd": 0.0021965
+      },
+      {
+        "image": "bathroom1.webp",
+        "parsed": {
+          "reasoning": "This bathroom features a very spacious layout with a designer freestanding tub, a long custom-style double vanity, and a frameless glass walk-in shower. Abundant natural light from the large window with a city view, coupled with premium finishes and statement lighting, creates a luxurious, spa-like atmosphere.",
+          "score": 7.0,
+          "level": 7,
+          "confidence": 0.95,
+          "valid": true,
+          "room_type": "bathroom"
+        },
+        "response_model": "gemini-2.5-flash",
+        "input_tokens": 1180,
+        "output_tokens": 1054,
+        "thought_tokens": 937,
+        "latency_s": 7.740200333995745,
+        "cost_usd": 0.002989
+      },
+      {
+        "image": "living1.webp",
+        "parsed": {
+          "reasoning": "This living room features expansive floor-to-ceiling windows offering panoramic city views, high ceilings, and a modern fireplace. The space is large and open, furnished with cohesive, high-end designer pieces and a statement chandelier, indicating premium materials and architectural design.",
+          "score": 6.9,
+          "level": 7,
+          "confidence": 0.95,
+          "valid": true,
+          "room_type": "living_room"
+        },
+        "response_model": "gemini-2.5-flash",
+        "input_tokens": 1156,
+        "output_tokens": 1126,
+        "thought_tokens": 1016,
+        "latency_s": 7.977030165995529,
+        "cost_usd": 0.0031618
+      }
+    ],
+    "claude-haiku-4-5": [
+      {
+        "image": "kitchen1.webp",
+        "parsed": {
+          "reasoning": "This kitchen features custom white cabinetry with detailed paneling and chrome hardware, a large central island with wood top and seating, premium white quartz countertops, integrated stainless appliances, recessed ceiling lighting, and expansive windows with natural light. The cohesive design, high-end finishes, and architectural detail place it solidly in the upscale-to-luxury range, though it lacks some of the most dramatic custom elements or professional-grade appliances of the highest tier.",
+          "score": 6.2,
+          "level": 6,
+          "confidence": 0.85,
+          "valid": true,
+          "room_type": "kitchen"
+        },
+        "response_model": "claude-haiku-4-5-20251001",
+        "input_tokens": 3761,
+        "output_tokens": 229,
+        "thought_tokens": 0,
+        "latency_s": 13.382415833002597,
+        "cost_usd": 0.004906
+      },
+      {
+        "image": "bathroom1.webp",
+        "parsed": {
+          "reasoning": "This is a spacious, light-filled master bathroom with premium finishes throughout. Key features include a freestanding soaking tub positioned at a window with city views, a double vanity with warm wood cabinetry and quality hardware, frameless glass shower enclosure, recessed and pendant lighting, and pristine white tile flooring and walls. The cohesive modern design, abundant natural light, and high-end materials (quality fixtures, designer pendant light, premium cabinetry) place this solidly in the upscale/luxury range.",
+          "score": 6.5,
+          "level": 7,
+          "confidence": 0.85,
+          "valid": true,
+          "room_type": "bathroom"
+        },
+        "response_model": "claude-haiku-4-5-20251001",
+        "input_tokens": 3834,
+        "output_tokens": 239,
+        "thought_tokens": 0,
+        "latency_s": 12.769131582994305,
+        "cost_usd": 0.005029
+      },
+      {
+        "image": "living1.webp",
+        "parsed": {
+          "reasoning": "This is a palatial, high-rise living room with expansive floor-to-ceiling windows offering dramatic city skyline views, soaring ceilings with a sculptural brass chandelier, premium custom furnishings (curved cream seating, wood-base tables), a fireplace feature, and refined finishes throughout. The scale, architectural detail, and curated contemporary design place it at the ultra-luxury tier.",
+          "score": 7.8,
+          "level": 8,
+          "confidence": 0.92,
+          "valid": true,
+          "room_type": "living_room"
+        },
+        "response_model": "claude-haiku-4-5-20251001",
+        "input_tokens": 4519,
+        "output_tokens": 232,
+        "thought_tokens": 0,
+        "latency_s": 4.124957625004754,
+        "cost_usd": 0.005679
+      }
+    ],
+    "claude-sonnet-4-6": [
+      {
+        "image": "kitchen1.webp",
+        "parsed": {
+          "reasoning": "This kitchen features floor-to-ceiling custom white shaker cabinetry with sleek bar-pull hardware, what appears to be a thick white stone (quartz or marble) countertop and backsplash, integrated/panel-ready appliances (built-in oven, concealed refrigerator), and light wide-plank hardwood flooring. The layout is spacious with a central island/dining table in white stone, open shelving accents, and large windows with city views. The overall design is cohesive, minimalist, and high-end, consistent with a luxury condominium or upscale renovation \u2014 aligning closely with Level 6 anchors, though the absence of a large statement island with seating and professional-grade appliances keeps it just below Level 7.",
+          "score": 6.2,
+          "level": 6,
+          "confidence": 0.85,
+          "valid": true,
+          "room_type": "kitchen"
+        },
+        "response_model": "claude-sonnet-4-6",
+        "input_tokens": 3762,
+        "output_tokens": 294,
+        "thought_tokens": 0,
+        "latency_s": 7.323577374998422,
+        "cost_usd": 0.015696
+      },
+      {
+        "image": "bathroom1.webp",
+        "parsed": {
+          "reasoning": "This is an exceptionally spacious, high-floor bathroom with floor-to-ceiling large-format white stone/porcelain tile on walls and floors, a freestanding designer soaking tub centered beneath a dramatic city-skyline window, a long custom double vanity with elegant brushed-gold cabinetry and crystal hardware, a statement pendant/chandelier light fixture, recessed lighting, wall sconces, and a separate glass-enclosed shower room visible to the right. The palatial scale, premium coordinated finishes, architectural detailing, and sweeping urban views push this firmly into ultra-luxury territory, comparable to the Level 7\u20138 anchors in the reference grid.",
+          "score": 7.7,
+          "level": 8,
+          "confidence": 0.88,
+          "valid": true,
+          "room_type": "bathroom"
+        },
+        "response_model": "claude-sonnet-4-6",
+        "input_tokens": 3835,
+        "output_tokens": 269,
+        "thought_tokens": 0,
+        "latency_s": 8.767551290999108,
+        "cost_usd": 0.01554
+      },
+      {
+        "image": "living1.webp",
+        "parsed": {
+          "reasoning": "This living room showcases exceptional luxury features: floor-to-ceiling windows with panoramic city skyline views (appearing to be a high-floor NYC penthouse or luxury condo), a sculptural brass branch chandelier, a working fireplace with clean white surround, and a curated designer furniture arrangement including an organic-form curved sofa, bespoke coffee tables, and elegant lounge chairs. The palette is a refined monochromatic cream/ivory with gold accents, crown molding, and access to a private terrace. The scale of the room is generous, the finishes are premium, and the overall design intent is clearly high-end contemporary luxury \u2014 aligning closely with Level 7, just shy of the palatial grandeur of Level 8.",
+          "score": 7.2,
+          "level": 7,
+          "confidence": 0.91,
+          "valid": true,
+          "room_type": "living_room"
+        },
+        "response_model": "claude-sonnet-4-6",
+        "input_tokens": 4520,
+        "output_tokens": 285,
+        "thought_tokens": 0,
+        "latency_s": 7.203668583002582,
+        "cost_usd": 0.017835
+      }
+    ]
+  }
+}
