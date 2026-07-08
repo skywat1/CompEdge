@@ -6,3 +6,5 @@
 .env
 geoclient_keys.txt
 .DS_Store
+
+/data
