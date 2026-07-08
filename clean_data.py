@@ -111,6 +111,15 @@ for href in df.loc[missing_sold, 'listing-link-href']:
     print(href)
 df = df[~missing_sold]
 
+# Drop non-arm's-length sales (deed/estate transfers) and price outliers
+MIN_PRICE, MAX_PRICE = 100_000, 10_000_000
+df['sold_price'] = pd.to_numeric(df['sold_price'], errors='coerce')
+print('Rows with sale price outside range:')
+out_of_range = (df['sold_price'] < MIN_PRICE) | (df['sold_price'] > MAX_PRICE)
+for href in df.loc[out_of_range, 'listing-link-href']:
+    print(href)
+df = df[~out_of_range]
+
 # Add days_old column
 reference_date = pd.Timestamp('2026-07-02')
 df['days_old'] = (reference_date - pd.to_datetime(df['sold_date'], format='%m/%d/%Y', errors='coerce')).dt.days

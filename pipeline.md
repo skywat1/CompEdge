@@ -54,13 +54,13 @@ flowchart TD
     LLM_SCORE --> AGGR_PHOTOS[Average across same rooms within each property]
     AGGR_PHOTOS --> IMG_MATRIX[(Luxury Scores per property<br/>Matrix)]
 
-    subgraph POI_PROC[Process POIs]
+    subgraph POI_PROC[Process POIs get_pois.py]
         GEOCLIENT_DATA --> CREATE_CIRCLES[Create Circle of 600m radius around each property]
         CREATE_CIRCLES --> POI_DATE_AGGR[Group properties into <br/> sold month]
         POI_DATE_AGGR --> OHSOME[Get POI counts per category in each month]
     end
 
-    OHSOME --> POI_MATRIX[(POI Scores per Property <br/> Matrix)]
+    OHSOME --> POI_MATRIX[(POI Scores per Property <br/> pois.csv)]
 
     JOIN_TABLES[Join Tables]
     STRUCT_ATTR --> JOIN_TABLES

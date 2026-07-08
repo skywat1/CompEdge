@@ -1,7 +1,8 @@
-"""XGBoost regression on structural attributes only.
+"""XGBoost regression on structural attributes and POI counts.
 
-Predicts log(sold_price) from cleaned_sold.csv and reports the loss (RMSE on
-log price) along with the median percent difference computed on regular price.
+Predicts log(sold_price) from cleaned_sold.csv joined with pois.csv and reports
+the loss (RMSE on log price) along with the median percent difference computed
+on regular price.
 """
 
 import numpy as np
@@ -10,13 +11,19 @@ import xgboost as xgb
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 
-# Structural attributes only
+# Structural Attributes
 NUMERIC_FEATURES = ['bedrooms', 'bathrooms', 'area-sqft', 'built_in', 'lot_area', 'days_old']
 CATEGORICAL_FEATURES = ['type', 'neighborhood']
-FEATURES = NUMERIC_FEATURES + CATEGORICAL_FEATURES
 TARGET = 'sold_price'
 
 df = pd.read_csv('data/cleaned_sold.csv')
+
+# POIs
+pois = pd.read_csv('data/pois.csv')
+POI_FEATURES = [c for c in pois.columns if c != 'zpid']
+df = df.merge(pois, on='zpid', how='left')
+
+FEATURES = NUMERIC_FEATURES + POI_FEATURES + CATEGORICAL_FEATURES
 
 # Drop rows without a sale price and build the feature matrix / target
 df = df[df[TARGET] > 0].copy()
