@@ -1,0 +1,343 @@
+Hyper params for 1-6 
+    n_estimators=500,
+    learning_rate=0.05,
+    max_depth=5,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    min_child_weight=3,
+
+1. Only structural attrs:
+
+Fold 1: log-RMSE = 0.4210 | median % diff = 15.71%
+Fold 2: log-RMSE = 0.4900 | median % diff = 15.51%
+Fold 3: log-RMSE = 0.5027 | median % diff = 15.64%
+Fold 4: log-RMSE = 0.4814 | median % diff = 15.74%
+Fold 5: log-RMSE = 0.4069 | median % diff = 16.28%
+--------------------------------------------------
+Loss (log-price RMSE):      0.4604 (+/- 0.0388)
+Median percent difference:  15.78% (+/- 0.26%)
+--------------------------------------------------
+Feature importance (gain, averaged across folds):
+  type           0.356
+  neighborhood   0.152
+  area-sqft      0.150
+  bathrooms      0.136
+  bedrooms       0.080
+  built_in       0.055
+  lot_area       0.045
+  days_old       0.027
+
+
+2. Structrual + POIs
+
+Fold 1: log-RMSE = 0.4027 | median % diff = 14.05%
+Fold 2: log-RMSE = 0.4787 | median % diff = 15.15%
+Fold 3: log-RMSE = 0.4811 | median % diff = 14.44%
+Fold 4: log-RMSE = 0.4774 | median % diff = 13.90%
+Fold 5: log-RMSE = 0.4057 | median % diff = 13.83%
+--------------------------------------------------
+Loss (log-price RMSE):      0.4491 (+/- 0.0367)
+Median percent difference:  14.27% (+/- 0.49%)
+--------------------------------------------------
+Feature importance (gain, averaged across folds):
+  type           0.271
+  area-sqft      0.096
+  neighborhood   0.086
+  nightlife      0.069
+  bathrooms      0.057
+  dining         0.050
+  fitness        0.047
+  bedrooms       0.041
+  culture        0.037
+  built_in       0.024
+  lot_area       0.023
+  civic_finance  0.020
+  mobility       0.019
+  education      0.019
+  health         0.018
+  disamenity     0.017
+  retail         0.017
+  groceries      0.017
+  fast_food      0.016
+  personal_svc   0.016
+  transit        0.015
+  parks_rec      0.014
+  days_old       0.013
+
+
+3. Structrual + POIs and Filter out outlier prices
+
+Fold 1: log-RMSE = 0.2945 | median % diff = 12.65%
+Fold 2: log-RMSE = 0.3090 | median % diff = 12.73%
+Fold 3: log-RMSE = 0.3195 | median % diff = 12.52%
+Fold 4: log-RMSE = 0.3107 | median % diff = 12.74%
+Fold 5: log-RMSE = 0.3263 | median % diff = 13.04%
+--------------------------------------------------
+Loss (log-price RMSE):      0.3120 (+/- 0.0108)
+Median percent difference:  12.74% (+/- 0.17%)
+--------------------------------------------------
+Feature importance (gain, averaged across folds):
+  type           0.374
+  nightlife      0.086
+  area-sqft      0.086
+  neighborhood   0.085
+  bathrooms      0.062
+  culture        0.049
+  bedrooms       0.041
+  dining         0.035
+  mobility       0.022
+  built_in       0.017
+  fitness        0.016
+  lot_area       0.015
+  education      0.014
+  retail         0.013
+  civic_finance  0.013
+  disamenity     0.012
+  health         0.010
+  transit        0.010
+  groceries      0.009
+  personal_svc   0.009
+  fast_food      0.008
+  parks_rec      0.008
+  days_old       0.007
+
+
+4. 5 seeded average, MAE loss, filter sq foot outliers, filter $/sqft
+
+Fold 1: log-RMSE = 0.2869 | median % diff = 11.71%
+Fold 2: log-RMSE = 0.3026 | median % diff = 12.07%
+Fold 3: log-RMSE = 0.3135 | median % diff = 12.22%
+Fold 4: log-RMSE = 0.3068 | median % diff = 11.44%
+Fold 5: log-RMSE = 0.2978 | median % diff = 11.97%
+--------------------------------------------------
+Loss (log-price RMSE):      0.3015 (+/- 0.0090)
+Median percent difference:  11.88% (+/- 0.28%)
+--------------------------------------------------
+Feature importance (gain, averaged across folds):
+  type           0.180
+  neighborhood   0.087
+  area-sqft      0.069
+  bathrooms      0.064
+  nightlife      0.058
+  bedrooms       0.047
+  culture        0.045
+  dining         0.034
+  built_in       0.033
+  fitness        0.033
+  mobility       0.032
+  disamenity     0.032
+  retail         0.029
+  civic_finance  0.029
+  lot_area       0.028
+  transit        0.028
+  health         0.026
+  personal_svc   0.026
+  groceries      0.025
+  parks_rec      0.025
+  education      0.025
+  fast_food      0.024
+  days_old       0.021
+
+
+5. 4 but with 10 seeds
+
+Fold 1: log-RMSE = 0.2864 | median % diff = 11.69%
+Fold 2: log-RMSE = 0.3020 | median % diff = 11.98%
+Fold 3: log-RMSE = 0.3138 | median % diff = 12.34%
+Fold 4: log-RMSE = 0.3067 | median % diff = 11.64%
+Fold 5: log-RMSE = 0.2977 | median % diff = 12.00%
+--------------------------------------------------
+Loss (log-price RMSE):      0.3013 (+/- 0.0092)
+Median percent difference:  11.93% (+/- 0.25%)
+--------------------------------------------------
+Feature importance (gain, averaged across folds):
+  type           0.181
+  neighborhood   0.088
+  area-sqft      0.070
+  bathrooms      0.062
+  nightlife      0.056
+  bedrooms       0.048
+  culture        0.046
+  dining         0.034
+  fitness        0.034
+  built_in       0.033
+  disamenity     0.031
+  mobility       0.031
+  retail         0.029
+  civic_finance  0.029
+  transit        0.028
+  lot_area       0.028
+  personal_svc   0.026
+  health         0.026
+  groceries      0.025
+  education      0.025
+  parks_rec      0.025
+  fast_food      0.024
+  days_old       0.021
+
+Therefore cap at 5, diminshing returns. Went up only because fold to fold
+spread is +/- 0.28%
+
+
+6. 5 but only structural attributes no pois
+
+Fold 1: log-RMSE = 0.2996 | median % diff = 13.29%
+Fold 2: log-RMSE = 0.3162 | median % diff = 13.88%
+Fold 3: log-RMSE = 0.3278 | median % diff = 13.96%
+Fold 4: log-RMSE = 0.3209 | median % diff = 13.17%
+Fold 5: log-RMSE = 0.3127 | median % diff = 12.92%
+--------------------------------------------------
+Loss (log-price RMSE):      0.3154 (+/- 0.0094)
+Median percent difference:  13.45% (+/- 0.41%)
+--------------------------------------------------
+Feature importance (gain, averaged across folds):
+  type           0.284
+  neighborhood   0.196
+  area-sqft      0.137
+  bathrooms      0.121
+  bedrooms       0.091
+  built_in       0.070
+  lot_area       0.055
+  days_old       0.047
+
+
+7. 5 but tuned hyper params: max_depth=7, learning_rate=0.02, n_estimators=2000
+(swept depth 4-8, min_child_weight, subsample/colsample, reg_lambda, lr;
+only depth and lr mattered - model was underfit. Config frozen here, no more
+tuning against these folds)
+
+Sweep results (single seed, changes relative to config 4):
+  baseline d5 mcw3 lr.05 n500      log-RMSE = 0.3037 | median % = 12.24%
+  depth 4                          log-RMSE = 0.3094 | median % = 12.54%
+  depth 6                          log-RMSE = 0.2995 | median % = 12.00%
+  depth 7                          log-RMSE = 0.2979 | median % = 11.60%
+  min_child_weight 1               log-RMSE = 0.3033 | median % = 12.19%
+  min_child_weight 8               log-RMSE = 0.3026 | median % = 12.11%
+  lr .03 n1000                     log-RMSE = 0.3011 | median % = 12.04%
+  lr .02 n2000                     log-RMSE = 0.2997 | median % = 11.74%
+  subsample/colsample .9           log-RMSE = 0.3046 | median % = 12.10%
+  colsample .6                     log-RMSE = 0.3031 | median % = 12.23%
+  reg_lambda 5                     log-RMSE = 0.3034 | median % = 11.99%
+  depth6 lr.03 n1000               log-RMSE = 0.2979 | median % = 11.69%
+  depth7 lr.03 n1000               log-RMSE = 0.2962 | median % = 11.69%
+  depth7 lr.02 n2000               log-RMSE = 0.2940 | median % = 11.28%
+  depth8 lr.03 n1000               log-RMSE = 0.2943 | median % = 11.32%
+  depth7 mcw8                      log-RMSE = 0.2970 | median % = 11.65%
+
+Winners re-checked with 5 seeds:
+  current config (= 4)             log-RMSE = 0.3015 | median % = 11.88%
+  depth7 only                      log-RMSE = 0.2946 | median % = 11.38%
+  depth7 lr.02 n2000 (chosen)      log-RMSE = 0.2929 | median % = 11.22%
+
+Fold 1: log-RMSE = 0.2802 (train 0.1942) | median % diff = 10.81% (train 2.68%)                                                   
+Fold 2: log-RMSE = 0.2946 (train 0.1968) | median % diff = 11.45% (train 2.69%)                                                   
+Fold 3: log-RMSE = 0.3045 (train 0.1938) | median % diff = 11.42% (train 2.65%)                                                   
+Fold 4: log-RMSE = 0.2958 (train 0.1909) | median % diff = 11.06% (train 2.69%)                                                   
+Fold 5: log-RMSE = 0.2893 (train 0.1937) | median % diff = 11.39% (train 2.62%)                                                   
+--------------------------------------------------
+Loss (log-price RMSE):      0.2929 (+/- 0.0080)
+Median percent difference:  11.22% (+/- 0.25%)
+--------------------------------------------------
+Feature importance (gain, averaged across folds):
+  type           0.137
+  neighborhood   0.088
+  area-sqft      0.051
+  nightlife      0.046
+  bathrooms      0.044
+  culture        0.043
+  fitness        0.038
+  lot_area       0.038
+  disamenity     0.037
+  mobility       0.036
+  transit        0.036
+  retail         0.036
+  bedrooms       0.036
+  civic_finance  0.035
+  dining         0.035
+  personal_svc   0.035
+  health         0.034
+  education      0.034
+  built_in       0.034
+  parks_rec      0.033
+  groceries      0.033
+  fast_food      0.032
+  days_old       0.030
+
+
+8. Tested different GBMs
+
+xgb
+Fold 1: log-RMSE = 0.2802 | median % diff = 10.81%
+Fold 2: log-RMSE = 0.2946 | median % diff = 11.45%
+Fold 3: log-RMSE = 0.3045 | median % diff = 11.42%
+Fold 4: log-RMSE = 0.2958 | median % diff = 11.06%
+Fold 5: log-RMSE = 0.2893 | median % diff = 11.39%
+Loss (log-price RMSE):      0.2929 (+/- 0.0080)
+Median percent difference:  11.22% (+/- 0.25%)
+
+lgb
+Fold 1: log-RMSE = 0.2798 | median % diff = 11.29%
+Fold 2: log-RMSE = 0.2940 | median % diff = 11.23%
+Fold 3: log-RMSE = 0.3035 | median % diff = 11.18%
+Fold 4: log-RMSE = 0.2977 | median % diff = 11.25%
+Fold 5: log-RMSE = 0.2930 | median % diff = 11.53%
+Loss (log-price RMSE):      0.2936 (+/- 0.0078)
+Median percent difference:  11.30% (+/- 0.12%)
+
+cb
+Fold 1: log-RMSE = 0.2898 | median % diff = 12.04%
+Fold 2: log-RMSE = 0.3029 | median % diff = 11.95%
+Fold 3: log-RMSE = 0.3100 | median % diff = 12.66%
+Fold 4: log-RMSE = 0.3108 | median % diff = 11.74%
+Fold 5: log-RMSE = 0.2993 | median % diff = 12.22%
+Loss (log-price RMSE):      0.3026 (+/- 0.0077)
+Median percent difference:  12.12% (+/- 0.31%)
+
+xgb + lgb
+Fold 1: log-RMSE = 0.2794 | median % diff = 11.09%
+Fold 2: log-RMSE = 0.2938 | median % diff = 11.41%
+Fold 3: log-RMSE = 0.3034 | median % diff = 11.35%
+Fold 4: log-RMSE = 0.2961 | median % diff = 11.04%
+Fold 5: log-RMSE = 0.2907 | median % diff = 11.19%
+Loss (log-price RMSE):      0.2927 (+/- 0.0079)
+Median percent difference:  11.22% (+/- 0.14%)
+
+xgb + cb
+Fold 1: log-RMSE = 0.2813 | median % diff = 11.36%
+Fold 2: log-RMSE = 0.2952 | median % diff = 11.52%
+Fold 3: log-RMSE = 0.3037 | median % diff = 11.65%
+Fold 4: log-RMSE = 0.2997 | median % diff = 10.86%
+Fold 5: log-RMSE = 0.2912 | median % diff = 11.34%
+Loss (log-price RMSE):      0.2942 (+/- 0.0077)
+Median percent difference:  11.35% (+/- 0.27%)
+
+lgb + cb
+Fold 1: log-RMSE = 0.2815 | median % diff = 11.57%
+Fold 2: log-RMSE = 0.2956 | median % diff = 11.78%
+Fold 3: log-RMSE = 0.3037 | median % diff = 11.74%
+Fold 4: log-RMSE = 0.3012 | median % diff = 11.02%
+Fold 5: log-RMSE = 0.2934 | median % diff = 11.69%
+Loss (log-price RMSE):      0.2951 (+/- 0.0077)
+Median percent difference:  11.56% (+/- 0.28%)
+
+xgb + lgb + cb
+Fold 1: log-RMSE = 0.2799 | median % diff = 11.35%
+Fold 2: log-RMSE = 0.2941 | median % diff = 11.32%
+Fold 3: log-RMSE = 0.3028 | median % diff = 11.62%
+Fold 4: log-RMSE = 0.2982 | median % diff = 10.95%
+Fold 5: log-RMSE = 0.2911 | median % diff = 11.42%
+Loss (log-price RMSE):      0.2932 (+/- 0.0077)
+Median percent difference:  11.33% (+/- 0.22%)
+
+Blending is a dead end on this data. OOF residual correlations between
+libraries (from data/gbm_experiment_preds.npz):
+  xgb vs lgb: 0.993 | xgb vs cb: 0.954 | lgb vs cb: 0.960
+All three models make nearly the same errors, so averaging has almost no
+variance to cancel: expected RMSE gain from a 0.993-correlated pair is
+~0.2%, which matches the observed 0.2929 -> 0.2927. CatBoost is strictly
+worse alone (0.3026 / 12.12%) and not diverse enough to pay for itself in
+any blend. The shared residual means the remaining error is missing
+information about the properties (condition, renovation, interior quality),
+not model variance -- more/better features is the way forward, not more
+models or tuning. Sticking with XGBoost alone (config 7).
+

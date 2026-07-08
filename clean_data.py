@@ -120,6 +120,24 @@ for href in df.loc[out_of_range, 'listing-link-href']:
     print(href)
 df = df[~out_of_range]
 
+# Null out impossible sqft values (e.g. co-ops listing the whole building's
+# footage) and lot_area for units that don't own their lot. Must happen before
+# the $/sqft filter so junk sqft doesn't produce a false-low $/sqft.
+_UNIT_TYPES = ['Condo', 'Cooperative']
+bad_sqft = (df['area-sqft'] < 100) | (df['area-sqft'] > 20_000) | \
+           (df['type'].isin(_UNIT_TYPES) & (df['area-sqft'] > 10_000))
+df.loc[bad_sqft, 'area-sqft'] = np.nan
+df.loc[df['type'].isin(_UNIT_TYPES), 'lot_area'] = np.nan
+
+# Drop non-arm's-length sales the price range missed (rows with missing sqft
+# pass through: NaN comparisons are False)
+MIN_PRICE_PER_SQFT = 100
+print('Rows with price per sqft below minimum:')
+below_ppsf = (df['sold_price'] / df['area-sqft']) < MIN_PRICE_PER_SQFT
+for href in df.loc[below_ppsf, 'listing-link-href']:
+    print(href)
+df = df[~below_ppsf]
+
 # Add days_old column
 reference_date = pd.Timestamp('2026-07-02')
 df['days_old'] = (reference_date - pd.to_datetime(df['sold_date'], format='%m/%d/%Y', errors='coerce')).dt.days
