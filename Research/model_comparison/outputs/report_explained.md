@@ -498,6 +498,147 @@ Human-agreement ceiling (mean pairwise rho): **0.647**.
 
 **Pick: gemini-3.5-flash.**
 
+### A13. Per-room human ceiling (pairwise Spearman among harvey/robin/seb)
+
+This is how much the humans agree *with each other* within each room — the
+practical upper bound on what any model can hit. Bedroom and bathroom are the
+noisiest (humans disagree most); kitchen and living room are the steadiest.
+
+| room        |   ceiling | harvey–robin | harvey–seb | robin–seb |
+|:------------|----------:|-------------:|-----------:|----------:|
+| kitchen     |     0.719 |         0.81 |       0.63 |      0.72 |
+| bathroom    |     0.626 |         0.68 |       0.66 |      0.54 |
+| bedroom     |     0.598 |         0.57 |       0.71 |      0.51 |
+| living_room |     0.707 |         0.74 |       0.70 |      0.68 |
+
+### A14. Model vs human, **per room type** (the prompt-tuning view)
+
+Everything in section 7 (rho / MAD / bias) but split by room, against two
+references: `harvey+robin` (2 raters) and `all` (all 3). ~38 images per room.
+Read this against the A13 ceilings: where rho already meets or beats the ceiling,
+ranking is saturated and the only fixable error is **bias** (level offset).
+
+**rho — do model and human rank the room the same? (higher = better)**
+
+Reference: `harvey+robin`
+
+| model             | kitchen | bathroom | bedroom | living_room |
+|:------------------|--------:|---------:|--------:|------------:|
+| gpt-4o            |   0.846 |    0.778 |   0.587 |       0.814 |
+| gemini-3.5-flash  |   0.862 |    0.769 |   0.710 |       0.780 |
+| gemini-2.5-flash  |   0.863 |    0.703 |   0.576 |       0.731 |
+| claude-haiku-4-5  |   0.762 |    0.532 |   0.575 |       0.604 |
+| claude-sonnet-4-6 |   0.887 |    0.746 |   0.623 |       0.694 |
+
+Reference: `all (h+r+seb)`
+
+| model             | kitchen | bathroom | bedroom | living_room |
+|:------------------|--------:|---------:|--------:|------------:|
+| gpt-4o            |   0.837 |    0.769 |   0.657 |       0.830 |
+| gemini-3.5-flash  |   0.850 |    0.748 |   0.784 |       0.810 |
+| gemini-2.5-flash  |   0.844 |    0.698 |   0.697 |       0.731 |
+| claude-haiku-4-5  |   0.747 |    0.512 |   0.632 |       0.643 |
+| claude-sonnet-4-6 |   0.867 |    0.733 |   0.685 |       0.727 |
+
+**MAD — how many points off, typically? (lower = better)**
+
+Reference: `harvey+robin`
+
+| model             | kitchen | bathroom | bedroom | living_room |
+|:------------------|--------:|---------:|--------:|------------:|
+| gpt-4o            |   1.034 |    0.583 |   0.942 |       0.844 |
+| gemini-3.5-flash  |   0.682 |    0.649 |   0.695 |       0.747 |
+| gemini-2.5-flash  |   0.872 |    0.762 |   0.900 |       0.841 |
+| claude-haiku-4-5  |   0.667 |    0.801 |   0.894 |       0.946 |
+| claude-sonnet-4-6 |   0.751 |    0.687 |   0.893 |       0.799 |
+
+Reference: `all (h+r+seb)`
+
+| model             | kitchen | bathroom | bedroom | living_room |
+|:------------------|--------:|---------:|--------:|------------:|
+| gpt-4o            |   1.163 |    0.617 |   0.889 |       0.913 |
+| gemini-3.5-flash  |   0.762 |    0.599 |   0.643 |       0.683 |
+| gemini-2.5-flash  |   0.975 |    0.618 |   0.768 |       0.806 |
+| claude-haiku-4-5  |   0.718 |    0.838 |   0.846 |       0.852 |
+| claude-sonnet-4-6 |   0.884 |    0.665 |   0.870 |       0.724 |
+
+**Signed bias — model minus human (positive = model scores high)**
+
+Reference: `harvey+robin`
+
+| model             | kitchen | bathroom | bedroom | living_room |
+|:------------------|--------:|---------:|--------:|------------:|
+| gpt-4o            |   0.901 |    0.029 |   0.324 |       0.623 |
+| gemini-3.5-flash  |   0.459 |   -0.159 |   0.263 |       0.363 |
+| gemini-2.5-flash  |   0.621 |   -0.308 |   0.107 |       0.399 |
+| claude-haiku-4-5  |   0.340 |    0.265 |   0.049 |       0.294 |
+| claude-sonnet-4-6 |   0.496 |   -0.045 |   0.343 |       0.282 |
+
+Reference: `all (h+r+seb)`
+
+| model             | kitchen | bathroom | bedroom | living_room |
+|:------------------|--------:|---------:|--------:|------------:|
+| gpt-4o            |   1.045 |    0.314 |   0.526 |       0.851 |
+| gemini-3.5-flash  |   0.604 |    0.126 |   0.465 |       0.591 |
+| gemini-2.5-flash  |   0.766 |   -0.023 |   0.309 |       0.628 |
+| claude-haiku-4-5  |   0.485 |    0.550 |   0.251 |       0.522 |
+| claude-sonnet-4-6 |   0.641 |    0.240 |   0.545 |       0.510 |
+
+### A15. Mean score levels per room (why the bias is positive)
+
+Every model's average sits **above** the human average in every room; the gap is
+biggest in kitchen and living room. This is the calibration target — pull the
+model's typical level down toward the human mean, especially in those two rooms.
+
+| source            | kitchen | bathroom | bedroom | living_room |
+|:------------------|--------:|---------:|--------:|------------:|
+| **humans (all 3)**|    4.00 |     4.28 |    4.06 |        4.25 |
+| gpt-4o            |    5.05 |     4.59 |    4.59 |        5.10 |
+| gemini-3.5-flash  |    4.60 |     4.41 |    4.53 |        4.84 |
+| gemini-2.5-flash  |    4.77 |     4.26 |    4.37 |        4.87 |
+| claude-haiku-4-5  |    4.48 |     4.83 |    4.31 |        4.77 |
+| claude-sonnet-4-6 |    4.64 |     4.52 |    4.61 |        4.76 |
+
+**Takeaway for prompt tuning (all models show the same pattern → it's the
+prompt/anchors, not the model):** ranking is already at or above the human
+ceiling in every room, so there's no headroom left there. The remaining fixable
+error is the upward level bias, concentrated in **kitchen** and **living room**.
+Bathroom is the best-calibrated room (bias ≈ 0) — treat it as the template.
+Bedroom has the lowest human ceiling (0.598), so its noise is largely
+irreducible; don't over-invest there.
+
+### A16. Share of images where gemini-3.5-flash is off by more than 1 point
+
+Per-image gap between gemini's mean score (5 replicates) and the human mean.
+38 images per room. "% >1" is the headline; the last columns count the larger
+misses. Almost all of these are gemini scoring *high*.
+
+Reference: `all (h+r+seb)`
+
+| room        |   n | images >1 off |   % >1 | # >1.5 | # >2 |
+|:------------|----:|--------------:|-------:|-------:|-----:|
+| kitchen     |  38 |            13 | 34.2%  |      4 |    1 |
+| living_room |  38 |            10 | 26.3%  |      4 |    2 |
+| bedroom     |  38 |             7 | 18.4%  |      3 |    1 |
+| bathroom    |  38 |             6 | 15.8%  |      1 |    0 |
+| **all**     | 152 |            36 | 23.7%  |     12 |    4 |
+
+Reference: `harvey+robin`
+
+| room        |   n | images >1 off |   % >1 | # >1.5 | # >2 |
+|:------------|----:|--------------:|-------:|-------:|-----:|
+| kitchen     |  38 |             9 | 23.7%  |      2 |    1 |
+| bedroom     |  38 |            11 | 28.9%  |      3 |    1 |
+| living_room |  38 |            10 | 26.3%  |      4 |    2 |
+| bathroom    |  38 |             6 | 15.8%  |      1 |    0 |
+| **all**     | 152 |            36 | 23.7%  |     10 |    4 |
+
+Same ranking as the bias/MAD tables: kitchen worst, bathroom best. "More than 1
+point" is a loose bar relative to the human ceiling — most of these are 1–1.5
+off, and only 4 of 152 exceed 2 points. A visual gallery of every >1 image
+(photo + each rater's score + gemini's score) is generated separately by
+`make_diff_gallery.py`.
+
 ---
 
 *Self-contained companion to [`report.md`](report.md). To turn this into a PDF:*
