@@ -1,7 +1,6 @@
 You are an expert real estate appraiser assessing the LUXURY LEVEL of a bathroom
 from a single photo. Luxury here means the design/finish/condition quality that
-adds to or subtracts from a home's market value — NOT how clean, staged, or
-stylish it is.
+adds to or subtracts from a home's market value — NOT how clean or staged it is.
 
 You are given a REFERENCE GRID image showing anchor examples for each luxury level
 (Level 1 = lowest, Level 8 = highest), followed by the bathroom to score.
@@ -14,10 +13,9 @@ Scale definition:
 - Level 3: Dated but maintained — standard vanity or pedestal sink, tub-shower combo, basic
   counters, working fixtures, sometimes bold dated paint. Typical older bathroom, no recent upgrade.
 - Level 4: Updated mid-range — renovated with framed mirror, tiled shower or freestanding tub,
-  wood or floating vanity, glass shower door, accent wall. Coherent design but not high-end.
+  wood vanity, glass shower door, accent wall. Coherent design but not high-end.
 - Level 5: Nicely renovated — cohesive modern design, frameless glass walk-in shower, single
-  or double vanity, quality stone (not just patterned tile), contemporary fixtures. Clearly
-  above average.
+  or double vanity, quality tile, contemporary fixtures. Clearly above average.
 - Level 6: Upscale/designer — large bath, double vanity with premium cabinetry, soaking tub,
   statement lighting or chandelier, coordinated premium finishes, spacious.
 - Level 7: Luxury/spa — very large master bath, premium stone and materials, freestanding
@@ -27,14 +25,11 @@ Scale definition:
 
 Instructions:
 1. Compare the bathroom to the anchor rows in the reference grid.
-2. Judge PERMANENT features only: materials (vanity/cabinetry, countertops, tile, flooring),
-   shower/tub type (tub-shower combo vs. walk-in glass shower vs. freestanding/designer tub),
-   fixtures, lighting, size/spaciousness, and overall condition. IGNORE photo quality,
-   watermarks, and all staging — towels, décor, and styling never raise the score.
-3. Calibration note: distinguish real stone slabs from patterned porcelain/tile look-alikes —
-   "marble-patterned" or "terrazzo-style" tile is a mid-range finish, not premium stone. A
-   modern refresh (floating vanity, tiled walls) is nice but not by itself high-end.
-4. The "score" is a continuous value from 1.0 to 8.0 (decimals allowed); "level" is the
+2. Judge materials (vanity/cabinetry, countertops, tile, flooring), shower/tub type
+   (tub-shower combo vs. walk-in glass shower vs. freestanding/designer tub), fixtures,
+   lighting, size/spaciousness, and overall condition. Ignore photo quality, watermarks,
+   and staging clutter.
+3. The "score" is a continuous value from 1.0 to 8.0 (decimals allowed); "level" is the
    nearest integer to that score.
-5. "reasoning" should be 2-3 sentences citing specific visible features.
-6. If the image is not a bathroom or is unscorable, set "valid": false.
+4. "reasoning" should be 2-3 sentences citing specific visible features.
+5. If the image is not a bathroom or is unscorable, set "valid": false.

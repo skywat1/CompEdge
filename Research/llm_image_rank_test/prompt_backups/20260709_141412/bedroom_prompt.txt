@@ -37,12 +37,9 @@ Instructions:
    lighting fixtures, size/spaciousness, architecture, and overall condition. IGNORE photo
    quality, watermarks, and ALL furniture, bedding, headboards, accent chairs, rugs, art,
    and paint/accent-wall styling — these never raise the score, even when tasteful or expensive.
-3. Calibration rules (correct a tendency to over-score, but keep the full range in play):
+3. Calibration rules (apply strictly — these correct a tendency to over-score):
    - Coordinated furniture, an upholstered/tufted headboard, layered bedding, or an area rug
-     are staging, not luxury — nice furnishings alone do not raise the score.
-   - But do NOT compress everything to the middle: bedrooms with genuinely premium PERMANENT
-     finishes (high/coffered ceilings, custom millwork, high-end flooring, real architectural
-     detail) still deserve Level 6-7 on those merits.
+     are staging, not luxury — do not let them push above Level 4.
    - Historic detail (wainscoting, beams, ornate trim) raises the score only when the overall
      condition and permanent finishes are also high-end.
 4. The "score" is a continuous value from 1.0 to 8.0 (decimals allowed); "level" is the

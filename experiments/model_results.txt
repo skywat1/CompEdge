@@ -360,3 +360,361 @@ unconstrained model was using real non-monotone signal, not noise --
 e.g. more bedrooms at fixed sqft means smaller rooms, and bed/bath
 counts likely proxy for property segments where the marginal room is
 worth less. Reverted; keeping config 7 unconstrained.
+
+10. With pluto features
+
+Fold 1: log-RMSE = 0.2877 (train 0.1949) | median % diff = 10.86% (train 2.52%)                                                                                      
+Fold 2: log-RMSE = 0.3075 (train 0.1927) | median % diff = 11.99% (train 2.48%)                                                                                      
+Fold 4: log-RMSE = 0.3034 (train 0.1910) | median % diff = 11.27% (train 2.42%)                                                                                      
+Fold 5: log-RMSE = 0.2942 (train 0.1927) | median % diff = 11.25% (train 2.57%)                                                                                      
+--------------------------------------------------
+Loss (log-price RMSE):      0.3009 (+/- 0.0088)
+Median percent difference:  11.56% (+/- 0.57%)
+--------------------------------------------------
+Feature importance (gain, averaged across folds):
+  ct2010         0.125
+  type           0.091
+  neighborhood   0.066
+  PolicePrct     0.039
+  area-sqft      0.036
+  cd             0.034
+  bathrooms      0.033
+  LandmarkStatus 0.031
+  Schooldist     0.029
+  bedrooms       0.028
+  nightlife      0.028
+  culture        0.026
+  lot_area       0.025
+  HistDist       0.025
+  fitness        0.025
+  FIRM07_FLAG    0.025
+  built_in       0.024
+  days_old       0.023
+  civic_finance  0.023
+  personal_svc   0.023
+  mobility       0.023
+  disamenity     0.023
+  retail         0.023
+  transit        0.023
+  health         0.022
+  dining         0.022
+  PFIRM15_FLAG   0.022
+  groceries      0.022
+  parks_rec      0.021
+  education      0.021
+  fast_food      0.021
+
+11. 10 w/out ct2010 because caused overfitting
+
+Fold 1: log-RMSE = 0.2775 (train 0.1915) | median % diff = 10.75% (train 2.67%)                                                                                      
+Fold 2: log-RMSE = 0.2908 (train 0.1899) | median % diff = 11.30% (train 2.48%)                                                                                      
+Fold 3: log-RMSE = 0.2984 (train 0.1900) | median % diff = 11.84% (train 2.42%)                                                                                      
+Fold 4: log-RMSE = 0.2926 (train 0.1869) | median % diff = 10.86% (train 2.63%)                                                                                      
+Fold 5: log-RMSE = 0.2871 (train 0.1920) | median % diff = 11.28% (train 2.48%)                                                                                      
+--------------------------------------------------
+Loss (log-price RMSE):      0.2893 (+/- 0.0069)
+Median percent difference:  11.21% (+/- 0.38%)
+--------------------------------------------------
+Feature importance (gain, averaged across folds):
+  type           0.104
+  neighborhood   0.076
+  PolicePrct     0.047
+  cd             0.042
+  area-sqft      0.040
+  bathrooms      0.036
+  Schooldist     0.035
+  PFIRM15_FLAG   0.032
+  culture        0.030
+  nightlife      0.030
+  lot_area       0.029
+  fitness        0.029
+  disamenity     0.029
+  bedrooms       0.028
+  transit        0.028
+  civic_finance  0.028
+  retail         0.027
+  personal_svc   0.027
+  dining         0.026
+  health         0.026
+  built_in       0.026
+  parks_rec      0.026
+  education      0.026
+  groceries      0.026
+  mobility       0.026
+  FIRM07_FLAG    0.025
+  fast_food      0.025
+  days_old       0.025
+  HistDist       0.024
+  LandmarkStatus 0.022
+
+Many features just rencode location and doesent provide new signal
+
+12. New pluto feature set. 37 features to test everything
+
+Fold 1: log-RMSE = 0.2874 (train 0.1868) | median % diff = 10.91% (train 2.20%)                                                                                      
+Fold 2: log-RMSE = 0.2997 (train 0.1856) | median % diff = 11.57% (train 2.00%)                                                                                      
+Fold 3: log-RMSE = 0.3034 (train 0.1845) | median % diff = 11.83% (train 1.99%)                                                                                      
+Fold 4: log-RMSE = 0.2983 (train 0.1831) | median % diff = 10.66% (train 2.04%)                                                                                      
+Fold 5: log-RMSE = 0.2878 (train 0.1853) | median % diff = 11.04% (train 2.17%)                                                                                      
+Training: [02:49<00:00,  6.78s/model]
+--------------------------------------------------
+Loss (log-price RMSE):      0.2953 (+/- 0.0065)
+Median percent difference:  11.20% (+/- 0.43%)
+--------------------------------------------------
+Feature importance (gain, averaged across folds):
+  tract2010      0.085
+  type           0.048
+  neighborhood   0.043
+  bldgclass      0.033
+  policeprct     0.025
+  sanitsub       0.022
+  area-sqft      0.022
+  sanitdistrict  0.022
+  nightlife      0.021
+  bathrooms      0.021
+  schooldist     0.018
+  yearbuilt      0.017
+  landmark       0.017
+  culture        0.016
+  spdist1        0.016
+  landuse        0.016
+  bedrooms       0.016
+  resarea        0.016
+  areasource     0.016
+  yearalter1     0.016
+  fitness        0.015
+  yearalter2     0.015
+  overlay1       0.015
+  builtfar       0.015
+  ext            0.015
+  dining         0.015
+  garagearea     0.015
+  bldgdepth      0.014
+  otherarea      0.014
+  lotfront       0.014
+  retailarea     0.014
+  commfar        0.014
+  ltdheight      0.014
+  bldgarea       0.014
+  lotdepth       0.014
+  lotarea        0.014
+  bldgfront      0.014
+  retail         0.014
+  lot_area       0.014
+  personal_svc   0.014
+  officearea     0.014
+  transit        0.014
+  civic_finance  0.014
+  days_old       0.014
+  mobility       0.014
+  health         0.014
+  disamenity     0.014
+  groceries      0.013
+  education      0.013
+  parks_rec      0.013
+  fast_food      0.013
+  histdist       0.013
+  built_in       0.013
+  strgearea      0.012
+  residfar       0.012
+  factryarea     0.010
+  sanitboro      0.001
+  overlay2       0.000
+
+Overfitting (esp with tract2010), not moving the needle at all
+
+13. More curated set of 15 pluto fields
+
+Fold 1: log-RMSE = 0.2801 (train 0.1879) | median % diff = 11.02% (train 2.17%)                                                                                      
+Fold 2: log-RMSE = 0.2863 (train 0.1887) | median % diff = 11.14% (train 2.14%)                                                                                      
+Fold 3: log-RMSE = 0.2988 (train 0.1846) | median % diff = 11.31% (train 2.10%)                                                                                      
+Fold 4: log-RMSE = 0.2896 (train 0.1814) | median % diff = 10.21% (train 2.31%)                                                                                      
+Fold 5: log-RMSE = 0.2805 (train 0.1843) | median % diff = 10.51% (train 2.12%)                                                                                      
+[02:25<00:00,  5.80s/model]
+--------------------------------------------------
+Loss (log-price RMSE):      0.2871 (+/- 0.0068)
+Median percent difference:  10.84% (+/- 0.41%)
+--------------------------------------------------
+Feature importance (gain, averaged across folds):
+  type           0.066
+  bldgclass      0.056
+  neighborhood   0.055
+  area-sqft      0.032
+  nightlife      0.031
+  culture        0.029
+  bathrooms      0.028
+  histdist       0.027
+  yearbuilt      0.026
+  dining         0.025
+  fitness        0.025
+  landuse        0.025
+  disamenity     0.024
+  lot_area       0.024
+  resarea        0.024
+  retail         0.023
+  mobility       0.023
+  builtfar       0.023
+  yearalter1     0.023
+  personal_svc   0.023
+  transit        0.023
+  civic_finance  0.023
+  health         0.022
+  bldgfront      0.022
+  bldgdepth      0.022
+  education      0.022
+  lotdepth       0.022
+  lotfront       0.022
+  bedrooms       0.022
+  commfar        0.022
+  groceries      0.022
+  residfar       0.022
+  parks_rec      0.022
+  bldgarea       0.021
+  fast_food      0.021
+  days_old       0.019
+  landmark       0.019
+  built_in       0.019
+
+
+14. Permutation importance within the pluto set
+5-fold, 6 shuffles/fold. Delta = degradation when feature is scrambled.
+baseline: median % diff = 11.00%   log-RMSE = 0.2882
+------------------------------------------------------------------
+feature         group     d.median%   (+/-)  d.logRMSE
+neighborhood    zillow       19.320   1.052     0.2016
+area-sqft       zillow       13.921   1.159     0.1776
+bldgclass       PLUTO         7.560   0.475     0.0864
+bedrooms        zillow        4.232   0.563     0.0561
+bathrooms       zillow        3.593   0.769     0.0288
+type            zillow        2.945   0.765     0.0244
+dining          poi           1.784   0.547     0.0168
+nightlife       poi           0.985   0.287     0.0061
+built_in        zillow        0.946   0.207     0.0054
+yearbuilt       PLUTO         0.931   0.237     0.0050
+bldgarea        PLUTO         0.613   0.218     0.0059
+culture         poi           0.531   0.158     0.0047
+resarea         PLUTO         0.509   0.231     0.0037
+fitness         poi           0.487   0.202     0.0039
+builtfar        PLUTO         0.410   0.185     0.0032
+bldgdepth       PLUTO         0.320   0.177     0.0024
+lot_area        zillow        0.242   0.144     0.0044
+disamenity      poi           0.241   0.142     0.0032
+lotfront        PLUTO         0.224   0.117     0.0020
+transit         poi           0.199   0.132     0.0014
+lotdepth        PLUTO         0.198   0.201     0.0020
+days_old        zillow        0.193   0.159     0.0012
+civic_finance   poi           0.166   0.126     0.0013
+retail          poi           0.165   0.164     0.0018
+residfar        PLUTO         0.163   0.067     0.0012
+education       poi           0.157   0.109     0.0015
+groceries       poi           0.151   0.090     0.0010
+health          poi           0.145   0.118     0.0014
+mobility        poi           0.137   0.124     0.0012
+personal_svc    poi           0.134   0.111     0.0005
+yearalter1      PLUTO         0.129   0.142     0.0017
+parks_rec       poi           0.123   0.099     0.0013
+bldgfront       PLUTO         0.112   0.113     0.0016
+fast_food       poi           0.067   0.125     0.0009
+landuse         PLUTO         0.028   0.049     0.0004
+histdist        PLUTO         0.027   0.071     0.0005
+landmark        PLUTO         0.002   0.008     0.0000
+commfar         PLUTO         0.001   0.052     0.0000
+==================================================================
+
+
+15. Narrow PLUTO subset 
+
+Fold 3: log-RMSE = 0.2982 (train 0.1853) | median % diff = 11.40% (train 2.20%)                                                                                      
+Fold 4: log-RMSE = 0.2901 (train 0.1827) | median % diff = 10.31% (train 2.44%)                                                                                      
+Fold 5: log-RMSE = 0.2815 (train 0.1847) | median % diff = 10.39% (train 2.26%)                                                                                      
+Training: [02:20<00:00,  5.63s/model]
+--------------------------------------------------
+Loss (log-price RMSE):      0.2875 (+/- 0.0063)
+Median percent difference:  10.84% (+/- 0.42%)
+--------------------------------------------------
+Feature importance (gain, averaged across folds):
+  type           0.078
+  bldgclass      0.067
+  neighborhood   0.066
+  nightlife      0.039
+  area-sqft      0.039
+  culture        0.036
+  bathrooms      0.036
+  dining         0.031
+  fitness        0.031
+  lot_area       0.030
+  mobility       0.030
+  disamenity     0.029
+  resarea        0.029
+  retail         0.029
+  transit        0.028
+  personal_svc   0.028
+  lotfront       0.028
+  civic_finance  0.028
+  builtfar       0.028
+  health         0.027
+  bldgarea       0.027
+  bldgdepth      0.027
+  education      0.027
+  groceries      0.027
+  parks_rec      0.027
+  bedrooms       0.027
+  residfar       0.026
+  fast_food      0.026
+  built_in       0.025
+  days_old       0.024
+
+Same loss as 13 therefore removed noise and kept important features
+
+
+16. 15 but drop type to see if bldgclass already encodes that
+
+Loss (log-price RMSE):      0.2900 (+/- 0.0064)
+Median percent difference:  10.89% (+/- 0.53%)
+vs WITH type:               10.84% / 0.2871  (curated 7-feature baseline)
+
+Therefore keep type 
+
+
+17. 
+WITH ASSESSED VALUE (assesstot + assessland added to curated set)
+------------------------------------------------------------------
+Loss (log-price RMSE):      0.2841 (+/- 0.0057)
+Median percent difference:  10.78% (+/- 0.61%)
+vs prior best (no assess):  10.84% / 0.2871
+------------------------------------------------------------------
+Permutation importance (degradation when scrambled; seed-0, 5-fold x 6):
+feature         group     d.median%   (+/-)  d.logRMSE
+neighborhood    zillow       17.696   0.851     0.1847
+area-sqft       zillow       13.472   0.929     0.1761
+bldgclass       PLUTO         7.778   0.495     0.0908
+bedrooms        zillow        4.411   0.435     0.0584
+bathrooms       zillow        3.754   0.590     0.0295
+type            zillow        2.964   0.825     0.0253
+built_in        zillow        1.846   0.230     0.0122
+dining          poi           1.741   0.341     0.0136
+assesstot       PLUTO         1.524   0.232     0.0166
+nightlife       poi           1.345   0.262     0.0073
+assessland      PLUTO         0.871   0.194     0.0088
+culture         poi           0.850   0.260     0.0064
+fitness         poi           0.557   0.170     0.0036
+bldgarea        PLUTO         0.492   0.166     0.0047
+resarea         PLUTO         0.471   0.254     0.0035
+builtfar        PLUTO         0.408   0.147     0.0042
+bldgdepth       PLUTO         0.308   0.139     0.0026
+disamenity      poi           0.281   0.120     0.0029
+mobility        poi           0.271   0.163     0.0016
+groceries       poi           0.215   0.108     0.0012
+transit         poi           0.199   0.119     0.0015
+lot_area        zillow        0.198   0.182     0.0036
+lotfront        PLUTO         0.188   0.116     0.0014
+education       poi           0.187   0.126     0.0016
+retail          poi           0.169   0.088     0.0014
+parks_rec       poi           0.164   0.113     0.0015
+residfar        PLUTO         0.164   0.145     0.0009
+fast_food       poi           0.156   0.171     0.0009
+health          poi           0.131   0.124     0.0013
+personal_svc    poi           0.121   0.082     0.0008
+days_old        zillow        0.100   0.180     0.0014
+civic_finance   poi           0.076   0.107     0.0011
+==================================================================

@@ -17,6 +17,18 @@ NUMERIC_FEATURES = ['bedrooms', 'bathrooms', 'area-sqft', 'built_in', 'lot_area'
 CATEGORICAL_FEATURES = ['type', 'neighborhood']
 TARGET = 'sold_price'
 
+# PLUTO attributes (data/pluto.csv from get_pluto.py), each sale bucketed to its
+# historical PLUTO version. histdist/landmark are binary flags (1/0/NaN); the
+# size/dimension/year/FAR fields are numeric; the rest are categorical codes.
+# Load-bearing set, kept after permutation-importance testing. bldgclass carries
+# almost all of PLUTO's value (beats Zillow `type`); the rest are small but
+# nonzero structural contributors. Dropped as ~0 / redundant: landmark, commfar,
+# histdist, landuse (redundant w/ neighborhood/bldgclass), lotdepth, yearalter1,
+# bldgfront (noise-level), yearbuilt (redundant w/ Zillow built_in).
+PLUTO_NUMERIC = ['bldgarea', 'resarea', 'builtfar', 'bldgdepth', 'lotfront', 'residfar',
+                 'assesstot', 'assessland']
+PLUTO_CATEGORICAL = ['bldgclass']
+
 df = pd.read_csv('data/cleaned_sold.csv')
 
 # POIs
@@ -24,7 +36,16 @@ pois = pd.read_csv('data/pois.csv')
 POI_FEATURES = [c for c in pois.columns if c != 'zpid']
 df = df.merge(pois, on='zpid', how='left')
 
-FEATURES = NUMERIC_FEATURES + POI_FEATURES + CATEGORICAL_FEATURES
+# PLUTO (already cleaned in get_pluto.py; just join and register the features)
+pluto = pd.read_csv(
+    'data/pluto.csv',
+    usecols=['zpid'] + PLUTO_NUMERIC + PLUTO_CATEGORICAL,
+    dtype={c: 'string' for c in PLUTO_CATEGORICAL},
+).drop_duplicates('zpid')
+df = df.merge(pluto, on='zpid', how='left')
+
+CATEGORICAL_FEATURES = CATEGORICAL_FEATURES + PLUTO_CATEGORICAL
+FEATURES = NUMERIC_FEATURES + PLUTO_NUMERIC + POI_FEATURES + CATEGORICAL_FEATURES
 
 # Drop rows without a sale price and build the feature matrix / target
 df = df[df[TARGET] > 0].copy()

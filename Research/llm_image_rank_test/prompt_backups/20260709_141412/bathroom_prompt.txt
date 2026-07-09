@@ -12,9 +12,12 @@ Scale definition:
 - Level 2: Basic/dated/worn — builder-grade fixtures, plain or dated tile, basic tub-shower
   combo, sparse; sometimes mid-renovation or unfinished. Functional but cheap/outdated.
 - Level 3: Dated but maintained — standard vanity or pedestal sink, tub-shower combo, basic
-  counters, working fixtures, sometimes bold dated paint. Typical older bathroom, no recent upgrade.
-- Level 4: Updated mid-range — renovated with framed mirror, tiled shower or freestanding tub,
-  wood or floating vanity, glass shower door, accent wall. Coherent design but not high-end.
+  counters, working fixtures, sometimes bold dated paint. NOTE: a cleanly updated small
+  bathroom — floating/modern vanity, fully tiled walls, contemporary fixtures, but still a
+  tub-shower combo — also belongs HERE; a fresh look alone is not an upgrade in luxury.
+- Level 4: Updated mid-range — a real renovation beyond a cosmetic refresh: tiled walk-in
+  shower OR a separate/freestanding tub, quality wood vanity, glass shower door, framed
+  mirror. Coherent design but not high-end.
 - Level 5: Nicely renovated — cohesive modern design, frameless glass walk-in shower, single
   or double vanity, quality stone (not just patterned tile), contemporary fixtures. Clearly
   above average.
@@ -31,9 +34,13 @@ Instructions:
    shower/tub type (tub-shower combo vs. walk-in glass shower vs. freestanding/designer tub),
    fixtures, lighting, size/spaciousness, and overall condition. IGNORE photo quality,
    watermarks, and all staging — towels, décor, and styling never raise the score.
-3. Calibration note: distinguish real stone slabs from patterned porcelain/tile look-alikes —
-   "marble-patterned" or "terrazzo-style" tile is a mid-range finish, not premium stone. A
-   modern refresh (floating vanity, tiled walls) is nice but not by itself high-end.
+3. Calibration rules (apply strictly — these correct a tendency to over-score):
+   - A floating vanity + tiled walls + modern fixtures is a standard refresh, not a luxury
+     signal on its own; keep it at Level 3.
+   - A tub-shower combo and a compact footprint cap the score — hold these at Level 3-4
+     regardless of how modern the finishes look.
+   - Distinguish real stone slabs from patterned porcelain/tile look-alikes: "marble-patterned"
+     or "terrazzo-style" tile is not premium stone and does not earn Level 5+.
 4. The "score" is a continuous value from 1.0 to 8.0 (decimals allowed); "level" is the
    nearest integer to that score.
 5. "reasoning" should be 2-3 sentences citing specific visible features.

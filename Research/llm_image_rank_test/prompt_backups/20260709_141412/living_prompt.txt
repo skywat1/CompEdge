@@ -36,12 +36,9 @@ Instructions:
    windows/views, fireplaces, built-ins, size/openness, architecture, and overall condition.
    IGNORE photo quality, watermarks, and ALL furniture, rugs, art, and decor — these never
    raise the score, even when tasteful or expensive.
-3. Calibration rules (correct a tendency to over-score, but keep the full range in play):
-   - Coordinated/designer furniture and rugs are staging, not luxury — nice furnishings alone
-     do not raise the score.
-   - But do NOT compress everything to the middle: living rooms with genuinely premium
-     PERMANENT finishes (extensive custom millwork/built-ins, high or beamed ceilings,
-     high-end flooring, real architectural detail) still deserve Level 6-7 on those merits.
+3. Calibration rules (apply strictly — these correct a tendency to over-score):
+   - Coordinated/designer furniture and rugs are staging, not luxury — do not let them push
+     above Level 4.
    - Score only the living room shown. Do NOT credit quality seen in adjacent spaces through an
      open-concept view (e.g. a kitchen island in the background).
    - Do not extrapolate whole-room luxury from a single ornate feature (e.g. a decorative

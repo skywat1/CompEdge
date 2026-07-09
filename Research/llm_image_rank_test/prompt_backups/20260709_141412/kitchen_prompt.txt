@@ -28,10 +28,9 @@ Instructions:
 3. Calibration rules (apply strictly — these correct a tendency to over-score):
    - A standard modern reno (stainless + quartz + subway tile + flat/shaker cabinets) is the
      EXPECTED baseline = Level 4, not 5+. Do not let "cohesive" or "modern" push it up.
-   - Compact or galley kitchens with no island usually top out around Level 4-5; a genuinely
-     high-end small kitchen (stone slabs, custom cabinetry) can still reach 5.
-   - Genuinely premium kitchens still score 6-7: natural-stone slabs, custom/integrated
-     cabinetry, or professional appliances earn the top of the scale on their own merits.
+   - Compact or galley kitchens with no island cap at Level 4 regardless of finish quality.
+   - Reserve Level 6-7 for natural-stone slabs, custom/integrated cabinetry AND generous
+     space together — a single premium touch (e.g. a waterfall island) is not enough.
 4. The "score" is a continuous value from 1.0 to 7.0 (decimals allowed); "level" is the
    nearest integer to that score.
 5. "reasoning" should be 2-3 sentences citing specific visible features.
