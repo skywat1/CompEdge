@@ -14,8 +14,8 @@ flag changes never resample it, so every rater sees the same images.
 Runs independently of the scoring stages: humans can rate while API calls run.
 
 Usage:
-    python stage2b_rating_app.py --manifest outputs/sample_manifest.csv \
-        --images-root ../.. --db outputs/human_ratings.sqlite
+    python stage2b_rating_app.py --manifest outputs/sample/sample_manifest.csv \
+        --images-root ../.. --db outputs/ratings/human_ratings.sqlite
 
 Then share http://<lan-ip>:5000 with raters (see README for Tailscale /
 cloudflared notes for raters outside the LAN).

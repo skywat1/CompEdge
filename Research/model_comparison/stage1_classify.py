@@ -25,8 +25,8 @@ on re-run. Raw API responses go to a JSONL.
 
 Usage:
     python stage1_classify.py --images-dir ../../images \
-        --out-csv outputs/classifications.csv \
-        --raw-jsonl outputs/classifications_raw.jsonl --workers 8
+        --out-csv outputs/classify/classifications.csv \
+        --raw-jsonl outputs/classify/classifications_raw.jsonl --workers 8
 """
 
 import argparse

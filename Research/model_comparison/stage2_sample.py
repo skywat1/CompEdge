@@ -11,8 +11,8 @@ for more classification.
 The manifest this writes is used verbatim for ALL five models — never resample.
 
 Usage:
-    python stage2_sample.py --classifications-csv outputs/classifications.csv \
-        --out-manifest outputs/sample_manifest.csv
+    python stage2_sample.py --classifications-csv outputs/classify/classifications.csv \
+        --out-manifest outputs/sample/sample_manifest.csv
 """
 
 import argparse

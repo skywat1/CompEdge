@@ -3,8 +3,8 @@
 Export Stage 2b human ratings from SQLite to CSV and parquet for Stage 5.
 
 Usage:
-    python export_ratings.py --db outputs/human_ratings.sqlite \
-        --out-csv outputs/human_ratings.csv \
+    python export_ratings.py --db outputs/ratings/human_ratings.sqlite \
+        --out-csv outputs/ratings/human_ratings.csv \
         --out-parquet outputs/parquet/human_ratings.parquet
 """
 

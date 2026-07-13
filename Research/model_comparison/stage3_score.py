@@ -9,9 +9,9 @@ five models. Checkpoints to an append-only CSV keyed by
 API responses are appended to a per-run JSONL.
 
 Usage:
-    python stage3_score.py --manifest outputs/sample_manifest.csv \
-        --images-root .. --out-csv outputs/scores.csv \
-        --raw-jsonl outputs/scores_raw.jsonl
+    python stage3_score.py --manifest outputs/sample/sample_manifest.csv \
+        --images-root .. --out-csv outputs/scores/scores.csv \
+        --raw-jsonl outputs/scores/scores_raw.jsonl
 """
 
 import argparse

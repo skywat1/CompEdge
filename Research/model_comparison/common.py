@@ -163,11 +163,15 @@ def load_room_assets(room_type: str):
 # ---------------------------------------------------------------------------
 def luxury_schema(room_type: str) -> dict:
     levels = list(range(1, ROOMS[room_type]["max_level"] + 1))
+    # living_room scores are integer-only (no decimals); other rooms keep the
+    # continuous 1.0-8.0 score.
+    score_field = {"type": "integer", "enum": levels} if room_type == "living_room" \
+        else {"type": "number"}
     return {
         "type": "object",
         "properties": {
             "reasoning":  {"type": "string"},
-            "score":      {"type": "number"},
+            "score":      score_field,
             "level":      {"type": "integer", "enum": levels},
             "confidence": {"type": "number"},
             "valid":      {"type": "boolean"},
@@ -215,10 +219,11 @@ def _gemini_schema(schema: dict) -> dict:
     """Gemini responseSchema doesn't accept integer enums; use min/max instead."""
     out = json.loads(json.dumps(schema))  # deep copy
     props = out.get("properties", {})
-    if "level" in props:
-        levels = props["level"].pop("enum")
-        props["level"]["minimum"] = min(levels)
-        props["level"]["maximum"] = max(levels)
+    for prop in props.values():
+        if prop.get("type") == "integer" and "enum" in prop:
+            levels = prop.pop("enum")
+            prop["minimum"] = min(levels)
+            prop["maximum"] = max(levels)
     out.pop("additionalProperties", None)
     return out
 

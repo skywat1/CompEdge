@@ -8,8 +8,8 @@ zpid, room type, replicate, score, reason, room-type judgment, token usage,
 latency, computed cost).
 
 Usage:
-    python stage4_consolidate.py --classifications-csv outputs/classifications.csv \
-        --manifest outputs/sample_manifest.csv --scores-csv outputs/scores.csv \
+    python stage4_consolidate.py --classifications-csv outputs/classify/classifications.csv \
+        --manifest outputs/sample/sample_manifest.csv --scores-csv outputs/scores/scores.csv \
         --out-dir outputs/parquet
 """
 

@@ -21,40 +21,55 @@ python dry_run.py
 #    account's tokens-per-minute cap (default 28000, just under a 30k Tier-1
 #    gpt-4o limit) so you don't spray 429s; raise it on higher tiers.
 python stage1_classify.py --images-dir ../../images \
-    --out-csv outputs/classifications.csv --raw-jsonl outputs/classifications_raw.jsonl \
+    --out-csv outputs/classify/classifications.csv --raw-jsonl outputs/classify/classifications_raw.jsonl \
     --workers 4 --tpm-limit 28000
 
 # 2. Build the stratified sample manifest (~38/room type, <=1 per type per zpid)
-python stage2_sample.py --classifications-csv outputs/classifications.csv \
-    --out-manifest outputs/sample_manifest.csv
+python stage2_sample.py --classifications-csv outputs/classify/classifications.csv \
+    --out-manifest outputs/sample/sample_manifest.csv
 
 # 2b. Human rating app (run any time after the manifest exists; independent of
 #     the scoring runs — humans can rate while API calls are in progress)
-python stage2b_rating_app.py --manifest outputs/sample_manifest.csv \
-    --images-root ../.. --db outputs/human_ratings.sqlite
+python stage2b_rating_app.py --manifest outputs/sample/sample_manifest.csv \
+    --images-root ../.. --db outputs/ratings/human_ratings.sqlite
 # ...then export for the analysis stage:
-python export_ratings.py --db outputs/human_ratings.sqlite \
-    --out-csv outputs/human_ratings.csv \
+python export_ratings.py --db outputs/ratings/human_ratings.sqlite \
+    --out-csv outputs/ratings/human_ratings.csv \
     --out-parquet outputs/parquet/human_ratings.parquet
 
 # 3. Score: every manifest image x 5 models x 5 replicates (resumable). Each
 #    provider runs in its own concurrent pool (wall-clock ~= slowest provider,
 #    not the sum); the OpenAI gpt-4o leg is paced under --tpm-limit. Lower
 #    --gemini-workers / --anthropic-workers if those providers 429 on your tier.
-python stage3_score.py --manifest outputs/sample_manifest.csv --images-root ../.. \
-    --out-csv outputs/scores.csv --raw-jsonl outputs/scores_raw.jsonl \
+python stage3_score.py --manifest outputs/sample/sample_manifest.csv --images-root ../.. \
+    --out-csv outputs/scores/scores.csv --raw-jsonl outputs/scores/scores_raw.jsonl \
     --openai-workers 3 --gemini-workers 6 --anthropic-workers 6 --tpm-limit 28000
 
 # 4. Consolidate to parquet
-python stage4_consolidate.py --classifications-csv outputs/classifications.csv \
-    --manifest outputs/sample_manifest.csv --scores-csv outputs/scores.csv \
+python stage4_consolidate.py --classifications-csv outputs/classify/classifications.csv \
+    --manifest outputs/sample/sample_manifest.csv --scores-csv outputs/scores/scores.csv \
     --out-dir outputs/parquet
 
 # 5. Analysis + markdown report (--ratings-parquet is optional; it enables the
 #    human-agreement sections and the ceiling-based recommendation)
 python stage5_report.py --parquet-dir outputs/parquet --images-dir ../../images \
-    --out-report outputs/report.md --plots-dir outputs/plots \
+    --out-report outputs/report/report.md --plots-dir outputs/plots \
     --ratings-parquet outputs/parquet/human_ratings.parquet
+```
+
+## Outputs layout
+
+```
+outputs/
+  classify/   Stage 1 — classifications.csv, classifications_raw.jsonl
+  sample/     Stage 2 — sample_manifest.csv
+  ratings/    Stage 2b/export — human_ratings.sqlite, human_ratings.csv
+  scores/     Stage 3 — scores*.csv, scores*_raw.jsonl (base + tuned/tuned2 variants)
+  parquet/, parquet_tuned/, parquet_tuned2/   Stage 4 — consolidated parquet per run
+  plots/      Stage 5 — chart PNGs
+  report/     Stage 5 — report.md, report_explained.{md,html,pdf}, md2html.py
+  gallery/    diff_gallery_*.html, make_diff_gallery.py
+  dry_run_results.json
 ```
 
 ## Rating app notes (Stage 2b)

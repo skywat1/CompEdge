@@ -15,7 +15,7 @@ Per model and per room type:
 
 Usage:
     python stage5_report.py --parquet-dir outputs/parquet \
-        --images-dir ../../images --out-report outputs/report.md \
+        --images-dir ../../images --out-report outputs/report/report.md \
         --plots-dir outputs/plots
 """
 
@@ -95,17 +95,20 @@ def compression_flags(scores: pd.DataFrame, max_levels: dict) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def plot_histograms(scores: pd.DataFrame, max_levels: dict, plots_dir: Path) -> Path:
-    models = [m for m in MODELS if m in scores["model"].unique()]
-    fig, axes = plt.subplots(len(models), len(ROOM_TYPES),
-                             figsize=(4 * len(ROOM_TYPES), 2.4 * len(models)),
+def _plot_score_grid(rows, max_levels: dict, title: str, plots_dir: Path, out_name: str) -> Path:
+    """Grid of score histograms, one row per (label, {room: scores}) and one
+    column per room type, on the shared 0.5-point binning. Used for both the
+    per-model histogram grid and the tuning-vs-human comparison, so the two
+    stay visually comparable."""
+    fig, axes = plt.subplots(len(rows), len(ROOM_TYPES),
+                             figsize=(4 * len(ROOM_TYPES), 2.4 * len(rows)),
                              squeeze=False)
     fig.patch.set_facecolor(SURFACE)
-    for i, model in enumerate(models):
+    for i, (label, by_room) in enumerate(rows):
         for j, room in enumerate(ROOM_TYPES):
             ax = axes[i][j]
             ax.set_facecolor(SURFACE)
-            s = scores[(scores["model"] == model) & (scores["room_type"] == room)]["score"].dropna()
+            s = pd.Series(by_room.get(room, [])).dropna()
             hi = max_levels[room]
             bins = np.arange(1.0, hi + 0.5, 0.5)
             ax.hist(s, bins=bins, color=BAR, edgecolor=SURFACE, linewidth=1)
@@ -119,14 +122,40 @@ def plot_histograms(scores: pd.DataFrame, max_levels: dict, plots_dir: Path) -> 
             if i == 0:
                 ax.set_title(room, color=INK, fontsize=10)
             if j == 0:
-                ax.set_ylabel(model, color=INK, fontsize=9)
-    fig.suptitle("Score distributions (all replicates)", color=INK, fontsize=12)
+                ax.set_ylabel(label, color=INK, fontsize=9)
+    fig.suptitle(title, color=INK, fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.97))
     plots_dir.mkdir(parents=True, exist_ok=True)
-    out = plots_dir / "score_histograms.png"
+    out = plots_dir / out_name
     fig.savefig(out, dpi=150, facecolor=SURFACE)
     plt.close(fig)
     return out
+
+
+def plot_histograms(scores: pd.DataFrame, max_levels: dict, plots_dir: Path) -> Path:
+    models = [m for m in MODELS if m in scores["model"].unique()]
+    rows = [(model, {room: scores[(scores["model"] == model) & (scores["room_type"] == room)]["score"]
+                     for room in ROOM_TYPES})
+            for model in models]
+    return _plot_score_grid(rows, max_levels, "Score distributions (all replicates)",
+                            plots_dir, "score_histograms.png")
+
+
+def plot_gemini_tuning_vs_human(gemini_variants: dict, human_refs: dict, room_lookup: pd.Series,
+                                max_levels: dict, plots_dir: Path) -> Path:
+    """Rows: each gemini-3.5-flash prompt revision (all replicates), then each
+    human reference (group averages first, then individual raters); columns:
+    room type. Same binning as score_histograms.png so a tuning pass's shift
+    can be read directly against where humans actually land."""
+    rows = []
+    for label, df in gemini_variants.items():
+        rows.append((label, {room: df[df["room_type"] == room]["score"] for room in ROOM_TYPES}))
+    for label, series in human_refs.items():
+        room_of = room_lookup.reindex(series.index)
+        rows.append((label, {room: series[room_of == room] for room in ROOM_TYPES}))
+    return _plot_score_grid(rows, max_levels,
+                            "gemini-3.5-flash tuning vs human raters, per room type",
+                            plots_dir, "tuning_vs_human_histograms.png")
 
 
 def _save(fig, plots_dir: Path, name: str) -> Path:
@@ -461,6 +490,14 @@ def main():
     ap.add_argument("--ratings-parquet", type=Path, default=None,
                     help="Optional Stage 2b human ratings parquet (from export_ratings.py); "
                          "enables the human-agreement sections")
+    ap.add_argument("--gemini-tuned-parquet", type=Path, default=None,
+                    help="scores.parquet for the tuned-v1 gemini-3.5-flash rescore. "
+                         "Default: outputs/parquet_tuned/scores.parquet next to --parquet-dir, "
+                         "if it exists")
+    ap.add_argument("--gemini-tuned2-parquet", type=Path, default=None,
+                    help="scores.parquet for the tuned-v2 gemini-3.5-flash rescore. "
+                         "Default: outputs/parquet_tuned2/scores.parquet next to --parquet-dir, "
+                         "if it exists")
     ap.add_argument("--rater-group", action="append", metavar="LABEL=r1,r2,...",
                     help="Named human reference averaged over the listed raters "
                          "(repeatable). An 'all' group over every rater is always added, "
@@ -496,6 +533,25 @@ def main():
     dis = disagreements_vs_reference(means)
     room_dis = room_disagreement(scores)
     costs = cost_table(scores, cls, args.images_dir)
+
+    # gemini-3.5-flash prompt-tuning variants (old = this run's own scores; tuned
+    # v1/v2 are separate rescore parquets, auto-discovered as sibling dirs unless
+    # overridden). Only used if ratings are also available, for the human rows.
+    def _load_gemini_variant(path: Path) -> pd.DataFrame:
+        g = pd.read_parquet(path)
+        g = g[g["error"].fillna("").astype(str).str.len() == 0].copy()
+        g["score"] = pd.to_numeric(g["score"], errors="coerce")
+        return g[g["model"] == "gemini-3.5-flash"]
+
+    gemini_tuning_variants = {}
+    if "gemini-3.5-flash" in scores["model"].unique():
+        gemini_tuning_variants["gemini-3.5-flash (old)"] = scores[scores["model"] == "gemini-3.5-flash"]
+    tuned_path = args.gemini_tuned_parquet or (args.parquet_dir.parent / "parquet_tuned" / "scores.parquet")
+    tuned2_path = args.gemini_tuned2_parquet or (args.parquet_dir.parent / "parquet_tuned2" / "scores.parquet")
+    if tuned_path.exists():
+        gemini_tuning_variants["gemini-3.5-flash (tuned v1)"] = _load_gemini_variant(tuned_path)
+    if tuned2_path.exists():
+        gemini_tuning_variants["gemini-3.5-flash (tuned v2)"] = _load_gemini_variant(tuned2_path)
 
     ratings = None
     if args.ratings_parquet and args.ratings_parquet.exists():
@@ -578,8 +634,24 @@ def main():
                   "who scored that image) and each rater individually. `n_images` is how",
                   "many images that reference covers — group and per-rater n differ",
                   "because raters completed different numbers of images.", "",
-                  fmt(ref_desc), "",
-                  "### Model agreement with each human reference — Spearman rho", "",
+                  fmt(ref_desc), ""]
+
+        if gemini_tuning_variants:
+            room_lookup = ratings.drop_duplicates("image_path").set_index("image_path")["room_type"]
+            tuning_order = [l for l in ("harvey_robin", "all") if l in refs] + \
+                           [l for l in ref_order if l not in ("harvey_robin", "all")]
+            human_subset = {l: refs[l] for l in tuning_order}
+            tuning_path = plot_gemini_tuning_vs_human(
+                gemini_tuning_variants, human_subset, room_lookup, max_levels, args.plots_dir)
+            lines += ["### gemini-3.5-flash prompt tuning vs human raters — score distributions",
+                      "", "Same binning as the score-distribution histograms above. Top rows are",
+                      "each gemini-3.5-flash prompt revision (all replicates); bottom rows are",
+                      "the human references (group averages, then each rater individually).",
+                      "Shows whether a tuning pass actually moved the model's distribution",
+                      "toward where humans land, room type by room type.", "",
+                      f"![gemini tuning vs human histograms]({rel(tuning_path)})", ""]
+
+        lines += ["### Model agreement with each human reference — Spearman rho", "",
                   "Higher is better. Columns are the human references; rows are models.", "",
                   f"![model agreement with human consensus]({rel(ha_path)})", "",
                   f"![full agreement heatmap]({rel(heat_path)})", "",
