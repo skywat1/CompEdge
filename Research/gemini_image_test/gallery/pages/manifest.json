@@ -1,0 +1,52 @@
+[
+  {
+    "file": "page_002_20260713T132250.html",
+    "label": "living \u00b7 07-13T13:22",
+    "timestamp": "2026-07-13T13:22:50",
+    "rooms": [
+      "living_room"
+    ],
+    "model": "gemini-3.5-flash",
+    "cost_usd": 0.4891815
+  },
+  {
+    "file": "page_003_20260713T132844.html",
+    "label": "living \u00b7 07-13T13:28",
+    "timestamp": "2026-07-13T13:28:44",
+    "rooms": [
+      "living_room"
+    ],
+    "model": "gemini-3.5-flash",
+    "cost_usd": 0.45423149999999995
+  },
+  {
+    "file": "page_004_20260713T135254.html",
+    "label": "living \u00b7 07-13T13:52",
+    "timestamp": "2026-07-13T13:52:54",
+    "rooms": [
+      "living_room"
+    ],
+    "model": "gemini-3.5-flash",
+    "cost_usd": 0.46241849999999995
+  },
+  {
+    "file": "page_005_20260713T140449.html",
+    "label": "living \u00b7 07-13T14:04",
+    "timestamp": "2026-07-13T14:04:49",
+    "rooms": [
+      "living_room"
+    ],
+    "model": "gemini-3.5-flash",
+    "cost_usd": 0.4328894999999998
+  },
+  {
+    "file": "page_006_20260713T145449.html",
+    "label": "kitchen \u00b7 07-13T14:54",
+    "timestamp": "2026-07-13T14:54:49",
+    "rooms": [
+      "kitchen"
+    ],
+    "model": "gemini-3.5-flash",
+    "cost_usd": 0.47598599999999996
+  }
+]
