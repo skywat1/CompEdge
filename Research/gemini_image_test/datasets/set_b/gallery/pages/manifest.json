@@ -1,0 +1,35 @@
+[
+  {
+    "file": "page_001_20260714T150425.html",
+    "label": "set_b baseline",
+    "timestamp": "2026-07-14T15:04:25",
+    "rooms": [
+      "kitchen",
+      "bathroom",
+      "bedroom",
+      "living_room"
+    ],
+    "model": "gemini-3.5-flash",
+    "cost_usd": 2.3943825
+  },
+  {
+    "file": "page_002_20260714T161637.html",
+    "label": "bedroom: 12yr reno cap",
+    "timestamp": "2026-07-14T16:16:37",
+    "rooms": [
+      "bedroom"
+    ],
+    "model": "gemini-3.5-flash",
+    "cost_usd": 0.574347
+  },
+  {
+    "file": "page_003_20260714T162011.html",
+    "label": "kitchen: 12 yr reno cap",
+    "timestamp": "2026-07-14T16:20:11",
+    "rooms": [
+      "kitchen"
+    ],
+    "model": "gemini-3.5-flash",
+    "cost_usd": 0.5781239999999999
+  }
+]

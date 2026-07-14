@@ -68,6 +68,10 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--images-dir", type=Path, required=True,
                     help="Directory of per-zpid image folders (images/<zpid>/<zpid>_N.jpg)")
+    ap.add_argument("--zpids-file", type=Path, default=None,
+                    help="Optional CSV/text file with a 'zpid' column (or one zpid per "
+                         "line); restrict classification to just these properties. Used to "
+                         "drive ppsf-stratified candidate selection.")
     ap.add_argument("--out-csv", type=Path, required=True,
                     help="Append-only classification checkpoint CSV")
     ap.add_argument("--raw-jsonl", type=Path, required=True,
@@ -94,6 +98,18 @@ def main():
           {t: len(z) for t, z in zpids_by_type.items()})
 
     zpid_dirs = sorted(d for d in args.images_dir.iterdir() if d.is_dir())
+    if args.zpids_file is not None:
+        text = args.zpids_file.read_text(encoding="utf-8").splitlines()
+        header = text[0].split(",") if text else []
+        col = header.index("zpid") if "zpid" in header else None
+        wanted = set()
+        for line in (text[1:] if col is not None else text):
+            line = line.strip()
+            if line:
+                wanted.add(line.split(",")[col] if col is not None else line)
+        zpid_dirs = [d for d in zpid_dirs if d.name in wanted]
+        print(f"Restricted to {len(zpid_dirs)} of {len(wanted)} listed zpids "
+              f"(the rest have no images/<zpid>/ folder).")
     random.Random(args.seed).shuffle(zpid_dirs)
 
     lock = threading.Lock()

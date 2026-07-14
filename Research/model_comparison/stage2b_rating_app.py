@@ -34,6 +34,14 @@ from flask import Flask, abort, jsonify, request, send_file
 
 from common import ROOMS, ROOM_TYPES
 
+# The human UI must match exactly what the gemini scorer saw: every room on a
+# 1–8 scale (kitchen included, not the old 1–7) and the SAME anchor grids the
+# model was shown, which live in gemini_image_test/rooms/<room>/grid.png. These
+# override common.ROOMS (whose kitchen is 1–7 with the older llm_image_rank_test
+# grids).
+RATE_MAX_LEVEL = 8
+GRIDS_DIR = Path(__file__).resolve().parents[2] / "Research" / "gemini_image_test" / "rooms"
+
 app = Flask(__name__)
 CFG = {}  # filled in main(): db path, images_root
 
@@ -142,7 +150,7 @@ def api_nav():
     return jsonify({
         "done": False, "pos": pos, "total": total, "done_count": done_count,
         "subset_id": row["id"], "image_path": row["image_path"],
-        "room_type": row["room_type"], "max_level": ROOMS[row["room_type"]]["max_level"],
+        "room_type": row["room_type"], "max_level": RATE_MAX_LEVEL,
         "image_url": f"/image/{row['id']}", "grid_url": f"/grid/{row['room_type']}",
         "existing_score": scores.get(row["image_path"]),  # None if not yet rated
     })
@@ -162,7 +170,7 @@ def api_rate():
         conn.close()
         abort(404, "unknown subset id")
     score = int(score)
-    if not (1 <= score <= ROOMS[row["room_type"]]["max_level"]):
+    if not (1 <= score <= RATE_MAX_LEVEL):
         conn.close()
         abort(400, "score out of range for this room type")
     conn.execute(
@@ -194,7 +202,7 @@ def image(sid):
 def grid(room_type):
     if room_type not in ROOMS:
         abort(404)
-    return send_file(ROOMS[room_type]["assets_dir"] / "grid.png")
+    return send_file(GRIDS_DIR / room_type / "grid.png")
 
 
 # ---------------------------------------------------------------------------

@@ -21,9 +21,12 @@ Examples:
     python rescore.py living_room --dry-run    # no API calls, fake scores
 """
 import argparse
+import csv
 import datetime as dt
+import json
 import random
 import sys
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -35,6 +38,16 @@ IMAGES_ROOT = REPO_ROOT
 MODEL = "gemini-3.5-flash"
 ROOM_ORDER = ["kitchen", "bathroom", "bedroom", "living_room"]
 MAX_LEVEL = 8  # every room scores on the same 1–8 scale (kitchen included)
+
+# scores.csv column order — written incrementally so an interrupted run is resumable
+SCORE_FIELDS = ["image_path", "zpid", "room_type", "score", "reasoning", "is_room",
+                "other_room", "input_tokens", "output_tokens", "cost_usd"]
+
+
+def _ts_from_dirname(name: str) -> str:
+    """runs/ dir name '2026-07-14T144924' -> timestamp '2026-07-14T14:49:24'."""
+    d, _, t = name.partition("T")
+    return f"{d}T{t[:2]}:{t[2:4]}:{t[4:6]}" if len(t) >= 6 else name
 
 # reuse the scoring machinery from the model-comparison experiment
 sys.path.insert(0, str(REPO_ROOT / "Research" / "model_comparison"))
@@ -145,26 +158,66 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("rooms", nargs="*", help="room names/prefixes; omit for picker")
+    ap.add_argument("--dataset", default="set_a",
+                    help="which datasets/<name>/ to score (default set_a)")
     ap.add_argument("--all", action="store_true", help="rescore all four rooms")
     ap.add_argument("--limit", type=int, default=0, help="cap images per room (0 = all)")
     ap.add_argument("--workers", type=int, default=12, help="concurrent API calls")
     ap.add_argument("--dry-run", action="store_true", help="no API calls, fake scores")
     ap.add_argument("--label", default="", help="tab label for this run's page")
+    ap.add_argument("--resume", nargs="?", const="latest", default=None, metavar="RUN",
+                    help="resume an interrupted run instead of starting fresh: bare "
+                         "--resume continues this dataset's most recent run; "
+                         "--resume <runs-folder-name> targets a specific one. "
+                         "Already-scored images are skipped.")
     args = ap.parse_args()
 
-    manifest = pd.read_csv(HERE / "data" / "sample_manifest.csv")
+    gallery.set_dataset(args.dataset)
+    ds_root = HERE / "datasets" / args.dataset
+    manifest = pd.read_csv(ds_root / "data" / "sample_manifest.csv")
     counts = manifest["room_type"].value_counts().to_dict()
+
+    # locate the run dir: resume an existing one, or start a fresh timestamped run
+    runs_root = ds_root / "runs"
+    meta = {}
+    if args.resume:
+        if args.resume == "latest":
+            cands = sorted(d for d in runs_root.glob("*") if (d / "scores.csv").exists())
+            if not cands:
+                sys.exit(f"nothing to resume under {runs_root}")
+            run_dir = cands[-1]
+        else:
+            run_dir = runs_root / args.resume.replace(":", "")
+            if not run_dir.exists():
+                sys.exit(f"no such run to resume: {run_dir}")
+        mp = run_dir / "run_meta.json"
+        meta = json.loads(mp.read_text()) if mp.exists() else {}
+        ts = meta.get("timestamp") or _ts_from_dirname(run_dir.name)
+        print(f"\nResuming run {run_dir.name} — already-scored images are skipped.")
+    else:
+        ts = dt.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        run_dir = runs_root / ts.replace(":", "")
+        run_dir.mkdir(parents=True, exist_ok=True)
 
     if args.all:
         rooms = ROOM_ORDER[:]
     elif args.rooms:
         rooms = resolve_named(args.rooms)
+    elif args.resume and meta.get("rooms"):
+        rooms = meta["rooms"]
     else:
         rooms = pick_rooms(counts)
     if not rooms:
         sys.exit("no rooms selected.")
 
-    print(f"\nRescoring {rooms} with {MODEL} "
+    label = args.label or meta.get("label") or (
+        ("dry: " if args.dry_run else "")
+        + f"{'+'.join(r.replace('_room','') for r in rooms)} · {ts[5:16]}")
+    if not args.resume:  # record what this run is, so it can be resumed later
+        (run_dir / "run_meta.json").write_text(
+            json.dumps({"timestamp": ts, "rooms": rooms, "label": label}))
+
+    print(f"Rescoring {rooms} with {MODEL} "
           f"({'DRY RUN' if args.dry_run else '1 call/image'})...\n")
 
     tasks = []
@@ -172,58 +225,73 @@ def main():
         imgs = manifest[manifest["room_type"] == room]
         if args.limit:
             imgs = imgs.head(args.limit)
-        for _, m in imgs.iterrows():
-            tasks.append((room, m["image_path"], str(m["zpid"])))
+        for _, mrow in imgs.iterrows():
+            tasks.append((room, mrow["image_path"], str(mrow["zpid"])))
 
-    rows = []
-    total_cost = 0.0
+    scores_csv = run_dir / "scores.csv"
+    done = set(pd.read_csv(scores_csv)["image_path"]) if scores_csv.exists() else set()
+    pending = [t for t in tasks if t[1] not in done]
+    print(f"{len(done)} already scored, {len(pending)} to go.\n")
 
-    def run(task):
+    # Crash-safe: each image is written and flushed the moment it completes, so a
+    # Ctrl-C / crash / API error keeps every image done so far. Rerun with
+    # --resume to score only what's missing (never re-pays for finished images).
+    lock = threading.Lock()
+    new_file = not scores_csv.exists() or scores_csv.stat().st_size == 0
+    fh = open(scores_csv, "a", newline="", encoding="utf-8")
+    writer = csv.DictWriter(fh, fieldnames=SCORE_FIELDS)
+    if new_file:
+        writer.writeheader()
+        fh.flush()
+    counter = {"n": len(done)}
+
+    def run_and_write(task):
         room, image_path, zpid = task
         res = dry_score(room) if args.dry_run else score_one(room, image_path)
-        return room, image_path, zpid, res
+        row = {"image_path": image_path, "zpid": zpid, "room_type": room, **res}
+        with lock:
+            writer.writerow({k: row.get(k, "") for k in SCORE_FIELDS})
+            fh.flush()
+            counter["n"] += 1
+            print(f"  scored {counter['n']}/{len(tasks)}", end="\r", flush=True)
+        return row
 
-    done = 0
-    if args.dry_run:
-        results = [run(t) for t in tasks]
-    else:
-        results = []
-        with ThreadPoolExecutor(max_workers=args.workers) as ex:
-            futs = {ex.submit(run, t): t for t in tasks}
-            for fut in as_completed(futs):
-                results.append(fut.result())
-                done += 1
-                print(f"  scored {done}/{len(tasks)}", end="\r", flush=True)
-        print()
+    try:
+        if args.dry_run:
+            for t in pending:
+                run_and_write(t)
+        else:
+            with ThreadPoolExecutor(max_workers=args.workers) as ex:
+                futs = {ex.submit(run_and_write, t): t for t in pending}
+                for fut in as_completed(futs):
+                    fut.result()
+        if pending:
+            print()
+    finally:
+        fh.close()
 
-    for room, image_path, zpid, res in results:
-        total_cost += res["cost_usd"]
-        rows.append({"image_path": image_path, "zpid": zpid, "room_type": room, **res})
-
-    run_df = pd.DataFrame(rows)
-    # keep a stable order: room, then image
-    run_df = run_df.sort_values(["room_type", "image_path"]).reset_index(drop=True)
-
-    ts = dt.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-    run_dir = HERE / "runs" / ts.replace(":", "")
-    run_dir.mkdir(parents=True, exist_ok=True)
-    run_df.to_csv(run_dir / "scores.csv", index=False)
-
-    label = args.label or (("dry: " if args.dry_run else "") +
-                           f"{'+'.join(r.replace('_room','') for r in rooms)} · {ts[5:16]}")
+    run_df = pd.read_csv(scores_csv).sort_values(
+        ["room_type", "image_path"]).reset_index(drop=True)
+    total_cost = float(run_df["cost_usd"].sum()) if "cost_usd" in run_df else 0.0
     cost_for_page = None if args.dry_run else total_cost
-    page_file = gallery.build_page(run_df, rooms, cost_for_page, label, ts)
 
     m = gallery.load_manifest()
-    m.append({"file": page_file, "label": label, "timestamp": ts, "rooms": rooms,
-              "model": MODEL, "cost_usd": cost_for_page})
+    existing = next((r for r in m if r.get("timestamp") == ts), None)
+    page_file = gallery.build_page(run_df, rooms, cost_for_page, label, ts,
+                                   page_file=existing["file"] if existing else None)
+    entry = {"file": page_file, "label": label, "timestamp": ts, "rooms": rooms,
+             "model": MODEL, "cost_usd": cost_for_page}
+    if existing:
+        existing.update(entry)
+    else:
+        m.append(entry)
     gallery.save_manifest(m)
     gallery.rebuild_index()
 
-    print(f"\nDone. {len(run_df)} images scored.")
+    print(f"\nDone. {len(run_df)} images scored ({len(pending)} this run).")
     if not args.dry_run:
         print(f"Run cost: ${total_cost:.4f}")
-    print(f"Scores:   {run_dir / 'scores.csv'}")
+    print(f"Scores:   {scores_csv}")
     print(f"Page:     gallery/pages/{page_file}")
     print(f"Gallery:  {gallery.INDEX}  (open in a browser; newest tab is selected)")
 

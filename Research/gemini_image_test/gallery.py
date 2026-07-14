@@ -25,12 +25,33 @@ from pathlib import Path
 import pandas as pd
 
 HERE = Path(__file__).resolve().parent
-PAGES_DIR = HERE / "gallery" / "pages"
-MANIFEST = PAGES_DIR / "manifest.json"
-INDEX = HERE / "gallery" / "index.html"
 REPO_ROOT = HERE.parents[1]  # Research/gemini_image_test -> Research -> repo
 IMAGES_ROOT = REPO_ROOT
 SOLD_CSV = REPO_ROOT / "data" / "cleaned_sold.csv"
+
+# Per-dataset paths (data / runs / gallery) live under datasets/<name>/; the
+# rooms/ prompts+grids stay shared/frozen at HERE. set_dataset() re-points the
+# module at a dataset; the default keeps the historical set_a in place.
+DATASET = "set_a"
+DS_ROOT = HERE / "datasets" / DATASET
+DATA_DIR = DS_ROOT / "data"
+RUNS_DIR = DS_ROOT / "runs"
+PAGES_DIR = DS_ROOT / "gallery" / "pages"
+MANIFEST = PAGES_DIR / "manifest.json"
+INDEX = DS_ROOT / "gallery" / "index.html"
+
+
+def set_dataset(name: str) -> None:
+    """Point the module's data/runs/gallery paths at datasets/<name>/."""
+    global DATASET, DS_ROOT, DATA_DIR, RUNS_DIR, PAGES_DIR, MANIFEST, INDEX
+    DATASET = name
+    DS_ROOT = HERE / "datasets" / name
+    DATA_DIR = DS_ROOT / "data"
+    RUNS_DIR = DS_ROOT / "runs"
+    PAGES_DIR = DS_ROOT / "gallery" / "pages"
+    MANIFEST = PAGES_DIR / "manifest.json"
+    INDEX = DS_ROOT / "gallery" / "index.html"
+    PAGES_DIR.mkdir(parents=True, exist_ok=True)  # a fresh dataset has no gallery yet
 
 ROOM_ORDER = ["kitchen", "bathroom", "bedroom", "living_room"]
 MAX_LEVEL = 8  # every room scores 1–8
@@ -127,15 +148,26 @@ function filterCards(mode, btn){
 """
 
 
-def build_page(run_scores: pd.DataFrame, rooms_scored: list, cost_usd: float,
-               label: str, timestamp: str, raters=("harvey", "robin", "seb")) -> str:
+def build_page(run_scores: pd.DataFrame, rooms_scored: list, cost_usd: "float | None",
+               label: str, timestamp: str, raters=None,
+               page_file: "str | None" = None) -> str:
     """Render one run's page HTML from its gemini scores + the human rankings.
 
     run_scores columns: image_path, zpid, room_type, score, reasoning.
     Returns the written page filename (relative to gallery/pages/).
     """
-    ratings = pd.read_csv(HERE / "data" / "human_ratings.csv")
-    raters = [r for r in raters]
+    # Human ratings may not exist yet (e.g. scoring gemini while raters are still
+    # working) — fall back to an empty frame so the page still renders, just with
+    # blank human/gap columns until human_ratings.csv is exported.
+    ratings_csv = DATA_DIR / "human_ratings.csv"
+    ratings = (pd.read_csv(ratings_csv) if ratings_csv.exists()
+               else pd.DataFrame(columns=["rater", "image_path", "room_type", "score", "timestamp"]))
+    # default to whoever actually rated this dataset (set_a: harvey/robin/seb;
+    # set_b: harvey/robin) so a page never shows an empty column for an absent rater
+    if raters is None:
+        raters = sorted(ratings["rater"].dropna().unique())
+    else:
+        raters = [r for r in raters]
 
     # per-rater wide table + human mean
     rr = ratings[ratings["rater"].isin(raters)]
@@ -254,13 +286,14 @@ Red = gemini higher than humans, amber = lower, green = within 1. Sorted by gap 
            f'<title>{_esc(label)}</title><style>{PAGE_CSS}</style></head>'
            f'<body>{body}<script>{PAGE_JS}</script></body></html>')
 
-    # next sequential page number
-    existing = sorted(PAGES_DIR.glob("page_*.html"))
-    nums = [int(p.stem.split("_")[1]) for p in existing if p.stem.split("_")[1].isdigit()]
-    n = (max(nums) + 1) if nums else 1
-    fname = f"page_{n:03d}_{timestamp.replace(':', '').replace('-', '')}.html"
-    (PAGES_DIR / fname).write_text(doc, encoding="utf-8")
-    return fname
+    # reuse the caller's filename (page rebuild) or allocate the next number
+    if page_file is None:
+        existing = sorted(PAGES_DIR.glob("page_*.html"))
+        nums = [int(p.stem.split("_")[1]) for p in existing if p.stem.split("_")[1].isdigit()]
+        n = (max(nums) + 1) if nums else 1
+        page_file = f"page_{n:03d}_{timestamp.replace(':', '').replace('-', '')}.html"
+    (PAGES_DIR / page_file).write_text(doc, encoding="utf-8")
+    return page_file
 
 
 # ---------------------------------------------------------------------------
@@ -365,7 +398,7 @@ function renderCmp(){
 
 def _run_dir(row: dict) -> Path:
     """runs/<timestamp-without-colons>/ for a manifest row."""
-    return HERE / "runs" / str(row.get("timestamp", "")).replace(":", "")
+    return RUNS_DIR / str(row.get("timestamp", "")).replace(":", "")
 
 
 def build_compare_data(rows: list) -> dict:
@@ -373,7 +406,7 @@ def build_compare_data(rows: list) -> dict:
     Zillow maps, so the browser can diff any two runs client-side."""
     # human mean per image
     hum = {}
-    rpath = HERE / "data" / "human_ratings.csv"
+    rpath = DATA_DIR / "human_ratings.csv"
     if rpath.exists():
         ratings = pd.read_csv(rpath)
         wide = ratings.pivot_table(index="image_path", columns="rater", values="score")
@@ -458,6 +491,23 @@ function showTab(i, btn){
     INDEX.write_text(doc, encoding="utf-8")
 
 
+def rebuild_pages() -> int:
+    """Re-render every run's page HTML from its saved runs/<ts>/scores.csv and the
+    CURRENT human_ratings.csv — no API calls. Use this to fill in the human/gap
+    columns after raters finish, when the gemini scoring was run earlier (e.g. in
+    parallel with rating). Overwrites each page in place; the manifest is untouched."""
+    n = 0
+    for row in load_manifest():
+        scores = _run_dir(row) / "scores.csv"
+        if not scores.exists():
+            continue
+        run_df = pd.read_csv(scores)
+        build_page(run_df, row.get("rooms", ROOM_ORDER), row.get("cost_usd"),
+                   row["label"], row.get("timestamp", ""), page_file=row["file"])
+        n += 1
+    return n
+
+
 def prune_missing_runs() -> list:
     """Drop manifest entries (and their orphaned page files) whose runs/<ts>/
     folder was deleted. Returns the labels that were removed."""
@@ -479,12 +529,20 @@ if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser(
         description="Rebuild gallery/index.html from the manifest + runs/ data.")
+    ap.add_argument("--dataset", default="set_a",
+                    help="which datasets/<name>/ to rebuild (default set_a)")
     ap.add_argument("--prune", action="store_true",
                     help="first drop any runs whose runs/<ts>/ folder was deleted "
                          "(removes their manifest entry and page file), then rebuild")
+    ap.add_argument("--rebuild-pages", action="store_true",
+                    help="re-render every run's page from its saved scores.csv + the "
+                         "current human_ratings.csv (fills gaps after raters finish; no API calls)")
     args = ap.parse_args()
+    set_dataset(args.dataset)
     if args.prune:
         gone = prune_missing_runs()
         print("pruned:", ", ".join(gone) if gone else "(none)")
+    if args.rebuild_pages:
+        print(f"rebuilt {rebuild_pages()} page(s) from saved scores + current ratings")
     rebuild_index()
     print(f"wrote {INDEX}")
